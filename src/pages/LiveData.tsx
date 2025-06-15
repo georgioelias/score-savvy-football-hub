@@ -57,7 +57,10 @@ const LiveData = () => {
 
   const getAvailableMatchdays = (): number[] => {
     const matches = tabData.matches || [];
-    const matchdays = [...new Set(matches.map((match: any) => match.matchday).filter((md: any) => md !== null && md !== undefined))];
+    const matchdays = [...new Set(matches
+      .map((match: any) => match.matchday)
+      .filter((md: any) => typeof md === 'number' && md !== null && md !== undefined)
+    )] as number[];
     return matchdays.sort((a: number, b: number) => b - a); // Latest first
   };
 
