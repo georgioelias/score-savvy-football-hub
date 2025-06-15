@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Users, ExternalLink, Calendar, MapPin } from 'lucide-react';
+import { Users } from 'lucide-react';
 import { Team } from '@/types/football';
 
 interface TeamsListProps {
@@ -35,55 +35,48 @@ const TeamsList: React.FC<TeamsListProps> = ({ teams, competitionName, seasonNam
             <TableRow>
               <TableHead className="w-[50px]">Logo</TableHead>
               <TableHead>Team Name</TableHead>
-              <TableHead className="text-center"><Calendar className="h-4 w-4 inline mr-1" />Founded</TableHead>
-              <TableHead><MapPin className="h-4 w-4 inline mr-1" />Stadium</TableHead>
-              <TableHead className="text-center"><ExternalLink className="h-4 w-4 inline mr-1" />Website</TableHead>
+              <TableHead>Founded</TableHead>
+              <TableHead>Stadium</TableHead>
+              <TableHead>Website</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {teams.map((team) => (
               <TableRow key={team.id} className="hover:bg-gray-50">
                 <TableCell>
-                  <img
-                    src={team.crest}
-                    alt={team.name}
-                    className="w-8 h-8 object-contain"
-                    onError={(e) => {
-                      e.currentTarget.src = 'https://www.thesportsdb.com/images/media/team/badge/default.png';
-                    }}
-                  />
+                  {team.crest && (
+                    <img
+                      src={team.crest}
+                      alt={team.name}
+                      className="w-8 h-8 object-contain"
+                      onError={(e) => {
+                        e.currentTarget.src = 'https://www.thesportsdb.com/images/media/team/badge/default.png';
+                      }}
+                    />
+                  )}
                 </TableCell>
                 <TableCell>
                   <div className="font-semibold text-gray-900">{team.name}</div>
                   <div className="text-sm text-gray-500">{team.tla}</div>
                 </TableCell>
-                <TableCell className="text-center">
-                  {team.founded ? (
-                    <div className="text-sm text-gray-900 font-medium">{team.founded}</div>
-                  ) : (
-                    <span className="text-gray-400 text-sm">Not available</span>
-                  )}
+                <TableCell>
+                  <div className="text-sm text-gray-600">{team.founded || 'N/A'}</div>
                 </TableCell>
                 <TableCell>
-                  {team.venue ? (
-                    <div className="text-sm text-gray-900">{team.venue}</div>
-                  ) : (
-                    <span className="text-gray-400 text-sm">Not available</span>
-                  )}
+                  <div className="text-sm text-gray-600">{team.venue}</div>
                 </TableCell>
-                <TableCell className="text-center">
+                <TableCell>
                   {team.website ? (
                     <a
                       href={team.website.startsWith('http') ? team.website : `https://${team.website}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center text-blue-600 hover:text-blue-800 text-sm underline"
+                      className="text-blue-600 hover:text-blue-800 text-sm underline"
                     >
-                      <ExternalLink className="h-3 w-3 mr-1" />
                       Visit
                     </a>
                   ) : (
-                    <span className="text-gray-400 text-sm">Not available</span>
+                    <span className="text-gray-400 text-sm">N/A</span>
                   )}
                 </TableCell>
               </TableRow>

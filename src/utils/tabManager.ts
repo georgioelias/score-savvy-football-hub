@@ -44,32 +44,11 @@ class TabManager {
           break;
         case 'league-tables':
           console.log('Fetching league standings for:', competition, 'season:', season);
-          const standingsResponse = await this.api.fetchStandings(competition, season);
-          console.log('Standings response from API:', standingsResponse);
-          
-          // The API returns { standings: Standing[] }, so we pass it directly
-          if (standingsResponse && standingsResponse.standings && standingsResponse.standings.length > 0) {
-            data = standingsResponse;
-            console.log('Processed standings data:', data);
-          } else {
-            console.warn('No standings data available');
-            data = {
-              standings: [],
-              error: 'No standings data available'
-            };
-          }
+          data = await this.api.fetchStandings(competition, season);
           break;
         case 'team-stats':
           console.log('Fetching teams info for:', competition, 'season:', season);
           data = await this.api.fetchTeams(competition, season);
-          console.log('Fetched teams data:', data);
-          // Ensure we have a valid teams array
-          if (!data.teams || !Array.isArray(data.teams)) {
-            console.warn('No teams data received, using empty array');
-            data = { teams: [] };
-          } else {
-            console.log(`Successfully fetched ${data.teams.length} teams for ${competition}`);
-          }
           break;
         case 'recent-results':
           console.log('Fetching recent results for competition:', competition, 'season:', season);
@@ -84,7 +63,7 @@ class TabManager {
           data = {};
       }
       
-      console.log('Tab data loaded successfully for', tabId, ':', data);
+      console.log('Tab data loaded successfully');
       this.setTabData(data);
       
       // Show success notification

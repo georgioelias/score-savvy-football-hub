@@ -136,12 +136,11 @@ const Analytics = () => {
         
         console.log('Standings response:', standingsResponse);
         
-        if (!standingsResponse || !standingsResponse.standings || standingsResponse.standings.length === 0) {
+        if (!standingsResponse || !standingsResponse.standings || !standingsResponse.standings[0]) {
           throw new Error('No standings data available');
         }
 
-        // The standings are already mapped correctly by the API
-        const standings = standingsResponse.standings;
+        const standings = standingsResponse.standings[0].table;
         console.log('Processing standings:', standings);
 
         // Process team statistics with enhanced metrics

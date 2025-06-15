@@ -29,7 +29,7 @@ const Header = () => {
               to="/live" 
               className={`transition-colors ${isActive('/live') ? 'text-green-600 font-medium' : 'text-gray-600 hover:text-green-600'}`}
             >
-              Data
+              Live Data
             </Link>
             <Link 
               to="/analytics" 
