@@ -26,7 +26,7 @@ class TabManager {
       switch (tabId) {
         case 'live-matches':
           console.log('Fetching live matches...');
-          data = await this.api.fetchMatches();
+          data = await this.api.fetchMatches(season);
           // Filter for live matches only
           if (data.matches) {
             const liveMatches = data.matches.filter((match: any) => 
@@ -51,7 +51,6 @@ class TabManager {
           break;
         case 'recent-results':
           console.log('Fetching recent results for competition:', competition, 'season:', season);
-          // Use competition-specific matches endpoint for more accurate results
           data = await this.api.fetchCompetitionMatches(competition, season);
           // Filter for finished matches only
           if (data.matches) {
@@ -66,7 +65,12 @@ class TabManager {
       this.setTabData(data);
     } catch (error) {
       console.error('Error switching tab:', error);
-      this.setTabData({ error: 'Failed to load data' });
+      this.setTabData({ 
+        error: error instanceof Error ? error.message : 'Failed to load data',
+        matches: [],
+        teams: [],
+        standings: []
+      });
     } finally {
       this.setLoading(false);
     }
