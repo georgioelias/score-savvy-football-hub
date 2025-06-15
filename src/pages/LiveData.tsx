@@ -55,9 +55,9 @@ const LiveData = () => {
     return () => clearInterval(interval);
   }, [autoRefresh, activeTab, selectedCompetition, selectedSeason]);
 
-  const getAvailableMatchdays = () => {
+  const getAvailableMatchdays = (): number[] => {
     const matches = tabData.matches || [];
-    const matchdays = [...new Set(matches.map((match: any) => match.matchday).filter(Boolean))];
+    const matchdays = [...new Set(matches.map((match: any) => match.matchday).filter((md: any) => md !== null && md !== undefined))];
     return matchdays.sort((a: number, b: number) => b - a); // Latest first
   };
 
@@ -419,7 +419,7 @@ const LiveData = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Matchdays</SelectItem>
-                {availableMatchdays.map((md) => (
+                {availableMatchdays.map((md: number) => (
                   <SelectItem key={md} value={md.toString()}>Matchday {md}</SelectItem>
                 ))}
               </SelectContent>
