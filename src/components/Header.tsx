@@ -15,7 +15,7 @@ const Header = () => {
             <img 
               src="/lovable-uploads/fbed4e9d-e039-44bf-82db-568f80b08761.png" 
               alt="Footballytics Logo" 
-              className="h-36"
+              className="h-12"
             />
           </Link>
           <div className="hidden md:flex items-center space-x-6">
