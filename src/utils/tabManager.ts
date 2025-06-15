@@ -47,20 +47,16 @@ class TabManager {
           const standingsResponse = await this.api.fetchStandings(competition, season);
           console.log('Standings response from API:', standingsResponse);
           
-          // Ensure we pass the standings array directly to the component
+          // The API returns { standings: Standing[] }, so we pass the standings array directly
           if (standingsResponse && standingsResponse.standings && standingsResponse.standings.length > 0) {
             data = {
-              standings: standingsResponse.standings,
-              competition: standingsResponse.competition,
-              season: standingsResponse.season
+              standings: standingsResponse.standings
             };
             console.log('Processed standings data:', data);
           } else {
             console.warn('No standings data available');
             data = {
               standings: [],
-              competition: { name: competition },
-              season: { startDate: season, endDate: season },
               error: 'No standings data available'
             };
           }

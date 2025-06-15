@@ -27,12 +27,8 @@ const StandingsTable: React.FC<StandingsTableProps> = ({ standings, competitionN
   console.log('StandingsTable received competitionName:', competitionName);
   console.log('StandingsTable received seasonName:', seasonName);
   
-  // Handle case where standings might be nested in array structure
-  let actualStandings = standings;
-  if (Array.isArray(standings) && standings.length > 0 && standings[0].table) {
-    actualStandings = standings[0].table;
-    console.log('Extracted standings from nested structure:', actualStandings);
-  }
+  // The standings should already be the correct array of Standing objects
+  const actualStandings = standings || [];
   
   if (!actualStandings || actualStandings.length === 0) {
     return (
