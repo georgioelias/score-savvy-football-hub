@@ -1,3 +1,4 @@
+
 class FootballAPI {
   public baseURL: string;
   public apiKey: string;
@@ -80,32 +81,12 @@ class FootballAPI {
             strStadium: "Stamford Bridge",
             strWebsite: "www.chelseafc.com",
             strLocation: "London, England"
-          },
-          {
-            idTeam: "133602",
-            strTeam: "Liverpool",
-            strTeamShort: "LIV",
-            strBadge: "https://www.thesportsdb.com/images/media/team/badge/liverpool.png", 
-            intFormedYear: "1892",
-            strStadium: "Anfield",
-            strWebsite: "www.liverpoolfc.com",
-            strLocation: "Liverpool, England"
-          },
-          {
-            idTeam: "133613",
-            strTeam: "Manchester City",
-            strTeamShort: "MCI",
-            strBadge: "https://www.thesportsdb.com/images/media/team/badge/manchester_city.png",
-            intFormedYear: "1880", 
-            strStadium: "Etihad Stadium",
-            strWebsite: "www.mancity.com",
-            strLocation: "Manchester, England"
           }
         ]
       };
     }
     
-    // Enhanced mock data for league table with ALL 20 teams
+    // Mock data for league table - only used when API completely fails
     if (endpoint.includes('lookuptable') || endpoint.includes('table')) {
       return {
         table: [
@@ -138,282 +119,12 @@ class FootballAPI {
             intPoints: "32",
             strBadge: "https://www.thesportsdb.com/images/media/team/badge/arsenal.png",
             strForm: "WWDLD"
-          },
-          {
-            intRank: "3",
-            idTeam: "133613",
-            strTeam: "Manchester City", 
-            intPlayed: "15",
-            intWin: "9",
-            intDraw: "4",
-            intLoss: "2",
-            intGoalsFor: "31",
-            intGoalsAgainst: "15",
-            intGoalDifference: "16",
-            intPoints: "31",
-            strBadge: "https://www.thesportsdb.com/images/media/team/badge/manchester_city.png",
-            strForm: "WWDWW"
-          },
-          {
-            intRank: "4",
-            idTeam: "133612",
-            strTeam: "Chelsea", 
-            intPlayed: "15",
-            intWin: "8",
-            intDraw: "4",
-            intLoss: "3",
-            intGoalsFor: "25",
-            intGoalsAgainst: "18",
-            intGoalDifference: "7",
-            intPoints: "28",
-            strBadge: "https://www.thesportsdb.com/images/media/team/badge/chelsea.png",
-            strForm: "WWLWW"
-          },
-          {
-            intRank: "5",
-            idTeam: "133615",
-            strTeam: "Tottenham Hotspur", 
-            intPlayed: "15",
-            intWin: "7",
-            intDraw: "3",
-            intLoss: "5",
-            intGoalsFor: "22",
-            intGoalsAgainst: "15",
-            intGoalDifference: "7",
-            intPoints: "24",
-            strBadge: "https://www.thesportsdb.com/images/media/team/badge/tottenham.png",
-            strForm: "LWWDL"
-          },
-          {
-            intRank: "6",
-            idTeam: "133616",
-            strTeam: "Manchester United", 
-            intPlayed: "15",
-            intWin: "6",
-            intDraw: "4",
-            intLoss: "5",
-            intGoalsFor: "20",
-            intGoalsAgainst: "18",
-            intGoalDifference: "2",
-            intPoints: "22",
-            strBadge: "https://www.thesportsdb.com/images/media/team/badge/manchester_united.png",
-            strForm: "WLDLW"
-          },
-          {
-            intRank: "7",
-            idTeam: "133714",
-            strTeam: "Brighton & Hove Albion", 
-            intPlayed: "15",
-            intWin: "6",
-            intDraw: "3",
-            intLoss: "6",
-            intGoalsFor: "24",
-            intGoalsAgainst: "23",
-            intGoalDifference: "1",
-            intPoints: "21",
-            strBadge: "https://www.thesportsdb.com/images/media/team/badge/brighton.png",
-            strForm: "WLWLL"
-          },
-          {
-            intRank: "8",
-            idTeam: "134777",
-            strTeam: "Newcastle United", 
-            intPlayed: "15",
-            intWin: "6",
-            intDraw: "2",
-            intLoss: "7",
-            intGoalsFor: "19",
-            intGoalsAgainst: "21",
-            intGoalDifference: "-2",
-            intPoints: "20",
-            strBadge: "https://www.thesportsdb.com/images/media/team/badge/newcastle.png",
-            strForm: "LLWDW"
-          },
-          {
-            intRank: "9",
-            idTeam: "133714",
-            strTeam: "West Ham United", 
-            intPlayed: "15",
-            intWin: "5",
-            intDraw: "4",
-            intLoss: "6",
-            intGoalsFor: "18",
-            intGoalsAgainst: "22",
-            intGoalDifference: "-4",
-            intPoints: "19",
-            strBadge: "https://www.thesportsdb.com/images/media/team/badge/westham.png",
-            strForm: "LWDLL"
-          },
-          {
-            intRank: "10",
-            idTeam: "133788",
-            strTeam: "Aston Villa", 
-            intPlayed: "15",
-            intWin: "5",
-            intDraw: "3",
-            intLoss: "7",
-            intGoalsFor: "17",
-            intGoalsAgainst: "20",
-            intGoalDifference: "-3",
-            intPoints: "18",
-            strBadge: "https://www.thesportsdb.com/images/media/team/badge/astonvilla.png",
-            strForm: "WLLDL"
-          },
-          {
-            intRank: "11",
-            idTeam: "133714",
-            strTeam: "Brentford", 
-            intPlayed: "15",
-            intWin: "4",
-            intDraw: "5",
-            intLoss: "6",
-            intGoalsFor: "19",
-            intGoalsAgainst: "21",
-            intGoalDifference: "-2",
-            intPoints: "17",
-            strBadge: "https://www.thesportsdb.com/images/media/team/badge/brentford.png",
-            strForm: "DDWLL"
-          },
-          {
-            intRank: "12",
-            idTeam: "133626",
-            strTeam: "Fulham", 
-            intPlayed: "15",
-            intWin: "4",
-            intDraw: "4",
-            intLoss: "7",
-            intGoalsFor: "16",
-            intGoalsAgainst: "20",
-            intGoalDifference: "-4",
-            intPoints: "16",
-            strBadge: "https://www.thesportsdb.com/images/media/team/badge/fulham.png",
-            strForm: "LLDWL"
-          },
-          {
-            intRank: "13",
-            idTeam: "133777",
-            strTeam: "Crystal Palace", 
-            intPlayed: "15",
-            intWin: "3",
-            intDraw: "6",
-            intLoss: "6",
-            intGoalsFor: "14",
-            intGoalsAgainst: "18",
-            intGoalDifference: "-4",
-            intPoints: "15",
-            strBadge: "https://www.thesportsdb.com/images/media/team/badge/crystalpalace.png",
-            strForm: "DDLLD"
-          },
-          {
-            intRank: "14",
-            idTeam: "133627",
-            strTeam: "Everton", 
-            intPlayed: "15",
-            intWin: "3",
-            intDraw: "5",
-            intLoss: "7",
-            intGoalsFor: "13",
-            intGoalsAgainst: "19",
-            intGoalDifference: "-6",
-            intPoints: "14",
-            strBadge: "https://www.thesportsdb.com/images/media/team/badge/everton.png",
-            strForm: "LLDDD"
-          },
-          {
-            intRank: "15",
-            idTeam: "133697",
-            strTeam: "Leicester City", 
-            intPlayed: "15",
-            intWin: "3",
-            intDraw: "4",
-            intLoss: "8",
-            intGoalsFor: "15",
-            intGoalsAgainst: "25",
-            intGoalDifference: "-10",
-            intPoints: "13",
-            strBadge: "https://www.thesportsdb.com/images/media/team/badge/leicester.png",
-            strForm: "LLLWD"
-          },
-          {
-            intRank: "16",
-            idTeam: "133719",
-            strTeam: "Ipswich Town", 
-            intPlayed: "15",
-            intWin: "2",
-            intDraw: "6",
-            intLoss: "7",
-            intGoalsFor: "12",
-            intGoalsAgainst: "23",
-            intGoalDifference: "-11",
-            intPoints: "12",
-            strBadge: "https://www.thesportsdb.com/images/media/team/badge/ipswich.png",
-            strForm: "LDDLL"
-          },
-          {
-            intRank: "17",
-            idTeam: "133599",
-            strTeam: "Wolverhampton Wanderers", 
-            intPlayed: "15",
-            intWin: "2",
-            intDraw: "3",
-            intLoss: "10",
-            intGoalsFor: "20",
-            intGoalsAgainst: "32",
-            intGoalDifference: "-12",
-            intPoints: "9",
-            strBadge: "https://www.thesportsdb.com/images/media/team/badge/wolves.png",
-            strForm: "LLLLD"
-          },
-          {
-            intRank: "18",
-            idTeam: "133709",
-            strTeam: "Nottingham Forest", 
-            intPlayed: "15",
-            intWin: "2",
-            intDraw: "2",
-            intLoss: "11",
-            intGoalsFor: "11",
-            intGoalsAgainst: "25",
-            intGoalDifference: "-14",
-            intPoints: "8",
-            strBadge: "https://www.thesportsdb.com/images/media/team/badge/nottingham.png",
-            strForm: "LLLLL"
-          },
-          {
-            intRank: "19",
-            idTeam: "133597",
-            strTeam: "Southampton", 
-            intPlayed: "15",
-            intWin: "1",
-            intDraw: "2",
-            intLoss: "12",
-            intGoalsFor: "9",
-            intGoalsAgainst: "28",
-            intGoalDifference: "-19",
-            intPoints: "5",
-            strBadge: "https://www.thesportsdb.com/images/media/team/badge/southampton.png",
-            strForm: "LLLLL"
-          },
-          {
-            intRank: "20",
-            idTeam: "133720",
-            strTeam: "Sheffield United", 
-            intPlayed: "15",
-            intWin: "0",
-            intDraw: "2",
-            intLoss: "13",
-            intGoalsFor: "7",
-            intGoalsAgainst: "35",
-            intGoalDifference: "-28",
-            intPoints: "2",
-            strBadge: "https://www.thesportsdb.com/images/media/team/badge/sheffield.png",
-            strForm: "LLLLL"
           }
         ]
       };
     }
     
-    // Enhanced mock data for matches/events with MORE matches across different matchdays
+    // Mock data for matches/events
     if (endpoint.includes('events') || endpoint.includes('matches')) {
       return {
         events: [
@@ -427,7 +138,6 @@ class FootballAPI {
             dateEvent: "2024-12-14",
             strTime: "17:30:00",
             strStatus: "Match Finished",
-            strThumb: "https://www.thesportsdb.com/images/media/event/thumb/arsenal_vs_chelsea.jpg",
             strSeason: "2024-2025",
             intRound: "16"
           },
@@ -441,93 +151,8 @@ class FootballAPI {
             dateEvent: "2024-12-15",
             strTime: "15:00:00", 
             strStatus: "Match Finished",
-            strThumb: "https://www.thesportsdb.com/images/media/event/thumb/man_city_vs_liverpool.jpg",
             strSeason: "2024-2025",
             intRound: "16"
-          },
-          {
-            idEvent: "3", 
-            strEvent: "Tottenham vs Manchester United",
-            strHomeTeam: "Tottenham Hotspur",
-            strAwayTeam: "Manchester United",
-            intHomeScore: "0",
-            intAwayScore: "2",
-            dateEvent: "2024-12-13",
-            strTime: "20:00:00", 
-            strStatus: "Match Finished",
-            strThumb: "https://www.thesportsdb.com/images/media/event/thumb/tottenham_vs_united.jpg",
-            strSeason: "2024-2025",
-            intRound: "15"
-          },
-          {
-            idEvent: "4", 
-            strEvent: "Brighton vs Newcastle",
-            strHomeTeam: "Brighton & Hove Albion",
-            strAwayTeam: "Newcastle United",
-            intHomeScore: "1",
-            intAwayScore: "1",
-            dateEvent: "2024-12-12",
-            strTime: "19:45:00", 
-            strStatus: "Match Finished",
-            strThumb: "https://www.thesportsdb.com/images/media/event/thumb/brighton_vs_newcastle.jpg",
-            strSeason: "2024-2025",
-            intRound: "15"
-          },
-          {
-            idEvent: "5", 
-            strEvent: "West Ham vs Fulham",
-            strHomeTeam: "West Ham United",
-            strAwayTeam: "Fulham",
-            intHomeScore: "2",
-            intAwayScore: "0",
-            dateEvent: "2024-12-11",
-            strTime: "18:30:00", 
-            strStatus: "Match Finished",
-            strThumb: "https://www.thesportsdb.com/images/media/event/thumb/westham_vs_fulham.jpg",
-            strSeason: "2024-2025",
-            intRound: "14"
-          },
-          {
-            idEvent: "6", 
-            strEvent: "Aston Villa vs Crystal Palace",
-            strHomeTeam: "Aston Villa",
-            strAwayTeam: "Crystal Palace",
-            intHomeScore: "3",
-            intAwayScore: "1",
-            dateEvent: "2024-12-10",
-            strTime: "15:00:00", 
-            strStatus: "Match Finished",
-            strThumb: "https://www.thesportsdb.com/images/media/event/thumb/villa_vs_palace.jpg",
-            strSeason: "2024-2025",
-            intRound: "14"
-          },
-          {
-            idEvent: "7", 
-            strEvent: "Brentford vs Leicester",
-            strHomeTeam: "Brentford",
-            strAwayTeam: "Leicester City",
-            intHomeScore: "4",
-            intAwayScore: "1",
-            dateEvent: "2024-12-09",
-            strTime: "16:00:00", 
-            strStatus: "Match Finished",
-            strThumb: "https://www.thesportsdb.com/images/media/event/thumb/brentford_vs_leicester.jpg",
-            strSeason: "2024-2025",
-            intRound: "13"
-          },
-          {
-            idEvent: "8", 
-            strEvent: "Everton vs Wolves",
-            strHomeTeam: "Everton",
-            strAwayTeam: "Wolverhampton Wanderers",
-            intHomeScore: "1",
-            intAwayScore: "0",
-            dateEvent: "2024-12-08",
-            strTime: "14:00:00", 
-            strStatus: "Match Finished",
-            strThumb: "https://www.thesportsdb.com/images/media/event/thumb/everton_vs_wolves.jpg",
-            strSeason: "2024-2025",
-            intRound: "13"
           }
         ]
       };
@@ -566,7 +191,8 @@ class FootballAPI {
           }
         },
         competition: { name: "Premier League" },
-        season: event.strSeason || season || "2024-2025"
+        season: event.strSeason || season || "2024-2025",
+        matchday: event.intRound ? parseInt(event.intRound) : null
       }));
       
       return { matches, count: matches.length };
@@ -596,7 +222,7 @@ class FootballAPI {
     console.log('Raw standings data from API:', data);
     
     if (data.table && Array.isArray(data.table)) {
-      // Get the COMPLETE table, not just top 5 - the API should return all teams
+      // Use ALL data from the API, don't limit it
       const table = data.table.map((team: any, index: number) => ({
         position: parseInt(team.intRank) || (index + 1),
         team: {
@@ -620,13 +246,6 @@ class FootballAPI {
       console.log('Transformed standings data:', table);
       console.log('Total teams in standings:', table.length);
       
-      // If we only got 5 teams from the API, supplement with mock data to show full table
-      if (table.length < 10) {
-        console.log('API returned incomplete data, supplementing with mock data for full table');
-        const mockData = this.getMockStandingsData(competition);
-        return mockData;
-      }
-      
       return {
         standings: [{
           stage: "REGULAR_SEASON",
@@ -641,7 +260,8 @@ class FootballAPI {
       };
     }
     
-    // Fallback to mock data if API doesn't return proper standings
+    // Only fallback to mock data if API completely fails
+    console.log('API returned no table data, using mock data as fallback');
     return this.getMockStandingsData(competition);
   }
 
@@ -649,13 +269,10 @@ class FootballAPI {
     const mockTables: { [key: string]: any[] } = {
       'CL': [
         { position: 1, team: { name: 'Manchester City', tla: 'MCI', crest: 'https://www.thesportsdb.com/images/media/team/badge/manchester_city.png' }, playedGames: 6, won: 5, draw: 1, lost: 0, points: 16, goalsFor: 15, goalsAgainst: 3, goalDifference: 12, form: 'WWWDW' },
-        { position: 2, team: { name: 'Real Madrid', tla: 'RMA', crest: 'https://www.thesportsdb.com/images/media/team/badge/real_madrid.png' }, playedGames: 6, won: 4, draw: 2, lost: 0, points: 14, goalsFor: 12, goalsAgainst: 4, goalDifference: 8, form: 'WDWWD' },
-        { position: 3, team: { name: 'Bayern Munich', tla: 'BAY', crest: 'https://www.thesportsdb.com/images/media/team/badge/bayern_munich.png' }, playedGames: 6, won: 4, draw: 1, lost: 1, points: 13, goalsFor: 14, goalsAgainst: 6, goalDifference: 8, form: 'WWLWW' }
+        { position: 2, team: { name: 'Real Madrid', tla: 'RMA', crest: 'https://www.thesportsdb.com/images/media/team/badge/real_madrid.png' }, playedGames: 6, won: 4, draw: 2, lost: 0, points: 14, goalsFor: 12, goalsAgainst: 4, goalDifference: 8, form: 'WDWWD' }
       ],
       'EL': [
-        { position: 1, team: { name: 'Arsenal', tla: 'ARS', crest: 'https://www.thesportsdb.com/images/media/team/badge/arsenal.png' }, playedGames: 6, won: 5, draw: 1, lost: 0, points: 16, goalsFor: 13, goalsAgainst: 2, goalDifference: 11, form: 'WWWDW' },
-        { position: 2, team: { name: 'Barcelona', tla: 'BAR', crest: 'https://www.thesportsdb.com/images/media/team/badge/barcelona.png' }, playedGames: 6, won: 4, draw: 2, lost: 0, points: 14, goalsFor: 11, goalsAgainst: 3, goalDifference: 8, form: 'WDWWD' },
-        { position: 3, team: { name: 'Atletico Madrid', tla: 'ATM', crest: 'https://www.thesportsdb.com/images/media/team/badge/atletico_madrid.png' }, playedGames: 6, won: 4, draw: 1, lost: 1, points: 13, goalsFor: 9, goalsAgainst: 4, goalDifference: 5, form: 'WWLWW' }
+        { position: 1, team: { name: 'Arsenal', tla: 'ARS', crest: 'https://www.thesportsdb.com/images/media/team/badge/arsenal.png' }, playedGames: 6, won: 5, draw: 1, lost: 0, points: 16, goalsFor: 13, goalsAgainst: 2, goalDifference: 11, form: 'WWWDW' }
       ]
     };
 
@@ -726,11 +343,16 @@ class FootballAPI {
   async fetchCompetitionMatches(competition = 'PL', season?: string): Promise<any> {
     const leagueId = this.getLeagueId(competition);
     
-    // Try multiple endpoints to get more complete match data
+    // Try multiple endpoints to get comprehensive match data
     const endpoints = [
-      `/eventspastleague.php?id=${leagueId}`,
-      `/eventsround.php?id=${leagueId}&r=38&s=${season || '2024-2025'}`,
-      `/eventsnextleague.php?id=${leagueId}`
+      `/eventspastleague.php?id=${leagueId}`, // Past matches
+      `/eventsround.php?id=${leagueId}&r=1&s=${season || '2024-2025'}`, // Round 1
+      `/eventsround.php?id=${leagueId}&r=2&s=${season || '2024-2025'}`, // Round 2
+      `/eventsround.php?id=${leagueId}&r=3&s=${season || '2024-2025'}`, // Round 3
+      `/eventsround.php?id=${leagueId}&r=4&s=${season || '2024-2025'}`, // Round 4
+      `/eventsround.php?id=${leagueId}&r=5&s=${season || '2024-2025'}`, // Round 5
+      `/eventsround.php?id=${leagueId}&r=38&s=${season || '2024-2025'}`, // Last round
+      `/eventsnextleague.php?id=${leagueId}` // Upcoming matches
     ];
     
     let allEvents: any[] = [];
@@ -752,12 +374,6 @@ class FootballAPI {
     );
     
     console.log('Total unique events found:', uniqueEvents.length);
-    
-    if (uniqueEvents.length === 0) {
-      // Use mock data if no events found
-      const mockData = this.getMockData('/events');
-      uniqueEvents.push(...(mockData.events || []));
-    }
     
     const matches = uniqueEvents.map((event: any) => ({
       id: event.idEvent,
@@ -786,7 +402,6 @@ class FootballAPI {
       competition: { name: this.getCompetitionName(competition) },
       season: event.strSeason || season || "2024-2025",
       matchday: event.intRound ? parseInt(event.intRound) : null,
-      // Add goalscorers if available
       goalscorers: this.parseGoalscorers(event)
     }));
     
@@ -795,7 +410,6 @@ class FootballAPI {
 
   private parseGoalscorers(event: any): any[] {
     // TheSportsDB doesn't always have goalscorer data in the basic event endpoint
-    // For now, return empty array - could be enhanced with separate API call
     return [];
   }
 
