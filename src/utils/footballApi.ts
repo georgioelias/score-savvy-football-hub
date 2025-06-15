@@ -211,9 +211,8 @@ class FootballAPI {
     
     // Try to get standings for specific season if provided
     let endpoint = `/lookuptable.php?l=${leagueId}`;
-    if (season && season !== '2024') {
-      const seasonStr = season === '2024' ? '2024-2025' : `${season}-${parseInt(season) + 1}`;
-      endpoint += `&s=${seasonStr}`;
+    if (season) {
+      endpoint += `&s=${season}`;
     }
     
     const data = await this.fetchData(endpoint);
@@ -430,43 +429,43 @@ class FootballAPI {
     return data.timeline ? data : { timeline: [] };
   }
 
-  async fetchAnalyticsData(competition = 'PL'): Promise<any> {
+  async fetchAnalyticsData(competition = 'PL', season?: string): Promise<any> {
     try {
       // Fetch both standings and recent matches for analytics
       const [standings, matches] = await Promise.all([
-        this.fetchStandings(competition),
-        this.fetchCompetitionMatches(competition)
+        this.fetchStandings(competition, season),
+        this.fetchCompetitionMatches(competition, season)
       ]);
 
-      const topTeams = standings.standings?.[0]?.table?.slice(0, 10) || [];
-      const recentMatches = matches.matches?.filter((m: any) => m.status === 'FINISHED').slice(0, 20) || [];
+      const standingsTable = standings.standings?.[0]?.table || [];
+      const recentMatches = matches.matches?.filter((m: any) => m.status === 'FINISHED').slice(0, 100) || [];
 
-      // Calculate analytics from real data
-      const totalGoals = recentMatches.reduce((sum: number, match: any) => {
-        return sum + (match.score?.fullTime?.home || 0) + (match.score?.fullTime?.away || 0);
-      }, 0);
-
-      const avgGoalsPerMatch = recentMatches.length > 0 ? (totalGoals / recentMatches.length).toFixed(1) : '0.0';
+      // Calculate analytics from real data (standings table for accuracy)
+      const totalGoals = standingsTable.reduce((sum: number, team: any) => sum + (team.goalsFor || 0), 0);
+      const totalMatchesPlayed = standingsTable.reduce((sum: number, team: any) => sum + (team.playedGames || 0), 0) / 2;
+      
+      const avgGoalsPerMatch = totalMatchesPlayed > 0 ? (totalGoals / totalMatchesPlayed).toFixed(1) : '0.0';
 
       // Find top scorer from standings
-      const topScoringTeam = topTeams.reduce((max: any, team: any) => {
-        return (team.goalsFor > (max?.goalsFor || 0)) ? team : max;
+      const topScoringTeamData = standingsTable.reduce((max: any, team: any) => {
+        return ((team.goalsFor || 0) > (max?.goalsFor || 0)) ? team : max;
       }, null);
+      
+      const totalWins = standingsTable.reduce((sum: number, team: any) => sum + (team.won || 0), 0);
+      const totalDraws = standingsTable.reduce((sum: number, team: any) => sum + (team.draw || 0), 0);
 
       return {
         totalGoals,
         avgGoalsPerMatch: parseFloat(avgGoalsPerMatch),
-        topScorerGoals: topScoringTeam?.goalsFor || 0,
-        topScoringTeam: topScoringTeam?.team?.name || 'Unknown',
-        cleanSheetsRecord: topTeams[0]?.goalsAgainst || 0,
-        topTeams: topTeams.slice(0, 5),
-        recentMatches: recentMatches.slice(0, 10),
+        topScorerGoals: topScoringTeamData?.goalsFor || 0,
+        topScoringTeam: topScoringTeamData?.team?.name || 'Unknown',
+        topTeams: standingsTable, // Return all teams for dropdowns
+        recentMatches: recentMatches,
         leagueStats: [
-          { name: 'Goals', value: totalGoals, color: '#0088FE' },
-          { name: 'Matches', value: recentMatches.length, color: '#00C49F' },
-          { name: 'Teams', value: topTeams.length, color: '#FFBB28' },
-          { name: 'Clean Sheets', value: Math.floor(Math.random() * 50) + 20, color: '#FF8042' },
-          { name: 'Cards', value: Math.floor(Math.random() * 200) + 100, color: '#8884D8' }
+          { name: 'Goals', value: totalGoals },
+          { name: 'Matches', value: Math.round(totalMatchesPlayed) },
+          { name: 'Wins', value: totalWins },
+          { name: 'Draws', value: totalDraws },
         ]
       };
     } catch (error) {
@@ -482,6 +481,17 @@ class FootballAPI {
         leagueStats: []
       };
     }
+  }
+
+  async fetchSeasons(competition: string): Promise<string[]> {
+    const leagueId = this.getLeagueId(competition);
+    const endpoint = `/search_all_seasons.php?id=${leagueId}`;
+    const data = await this.fetchData(endpoint);
+    if (data && data.seasons) {
+      return data.seasons.map((s: any) => s.strSeason).reverse();
+    }
+    // Fallback seasons if API fails. Reverse to show most recent first.
+    return ['2024-2025', '2023-2024', '2022-2023', '2021-2022'];
   }
 }
 

@@ -1,14 +1,15 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Link } from 'react-router-dom';
 import { Trophy, TrendingUp, BarChart3, PieChart } from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart as RechartsPieChart, Cell, Pie } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Cell } from 'recharts';
 import FootballAPI from '../utils/footballApi';
 
 const Analytics = () => {
   const [selectedCompetition, setSelectedCompetition] = useState('PL');
+  const [selectedSeason, setSelectedSeason] = useState<string | undefined>(undefined);
+  const [seasons, setSeasons] = useState<string[]>([]);
   const [selectedTeam1, setSelectedTeam1] = useState('');
   const [selectedTeam2, setSelectedTeam2] = useState('');
   const [analyticsData, setAnalyticsData] = useState<any>({});
@@ -21,25 +22,56 @@ const Analytics = () => {
     'PD': 'La Liga', 
     'SA': 'Serie A',
     'BL1': 'Bundesliga',
-    'FL1': 'Ligue 1'
+    'FL1': 'Ligue 1',
+    'CL': 'Champions League',
+    'EL': 'Europa League'
   };
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
   useEffect(() => {
-    loadAnalyticsData();
+    loadSeasons();
   }, [selectedCompetition]);
 
-  const loadAnalyticsData = async () => {
+  useEffect(() => {
+    if (selectedSeason) {
+      loadAnalyticsData();
+    }
+  }, [selectedSeason]);
+
+  const loadSeasons = async () => {
     setLoading(true);
     try {
-      const data = await api.fetchAnalyticsData(selectedCompetition);
+      const seasonsData = await api.fetchSeasons(selectedCompetition);
+      setSeasons(seasonsData);
+      const newSeason = seasonsData.length > 0 ? seasonsData[0] : undefined;
+      setSelectedSeason(newSeason);
+      if (!newSeason) {
+        setAnalyticsData({});
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error('Error loading seasons:', error);
+      const fallbackSeasons = ['2024-2025', '2023-2024', '2022-2023'];
+      setSeasons(fallbackSeasons);
+      setSelectedSeason(fallbackSeasons[0]);
+    }
+  };
+
+  const loadAnalyticsData = async () => {
+    if (!selectedSeason) return;
+    setLoading(true);
+    try {
+      const data = await api.fetchAnalyticsData(selectedCompetition, selectedSeason);
       setAnalyticsData(data);
       
       // Set default teams for comparison
       if (data.topTeams?.length >= 2) {
         setSelectedTeam1(data.topTeams[0]?.team?.name || '');
         setSelectedTeam2(data.topTeams[1]?.team?.name || '');
+      } else {
+        setSelectedTeam1('');
+        setSelectedTeam2('');
       }
     } catch (error) {
       console.error('Error loading analytics data:', error);
@@ -55,10 +87,13 @@ const Analytics = () => {
     if (!team1Data || !team2Data) return [];
 
     return [
-      { stat: 'Goals For', team1: team1Data.goalsFor, team2: team2Data.goalsFor },
       { stat: 'Points', team1: team1Data.points, team2: team2Data.points },
       { stat: 'Wins', team1: team1Data.won, team2: team2Data.won },
-      { stat: 'Goal Difference', team1: team1Data.goalDifference, team2: team2Data.goalDifference }
+      { stat: 'Draws', team1: team1Data.draw, team2: team2Data.draw },
+      { stat: 'Losses', team1: team1Data.lost, team2: team2Data.lost },
+      { stat: 'Goals For', team1: team1Data.goalsFor, team2: team2Data.goalsFor },
+      { stat: 'Goals Against', team1: team1Data.goalsAgainst, team2: team2Data.goalsAgainst },
+      { stat: 'Goal Diff', team1: team1Data.goalDifference, team2: team2Data.goalDifference }
     ];
   };
 
@@ -122,10 +157,10 @@ const Analytics = () => {
 
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">Live Analytics & Data</h2>
-          <div className="flex items-center space-x-4 mb-6">
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">Live Analytics & Data - {selectedSeason}</h2>
+          <div className="flex flex-wrap items-center gap-4 mb-6">
             <Select value={selectedCompetition} onValueChange={setSelectedCompetition}>
-              <SelectTrigger className="w-[200px]">
+              <SelectTrigger className="w-full sm:w-[200px]">
                 <SelectValue placeholder="Select League" />
               </SelectTrigger>
               <SelectContent>
@@ -134,6 +169,18 @@ const Analytics = () => {
                 ))}
               </SelectContent>
             </Select>
+            {seasons.length > 0 && selectedSeason && (
+              <Select value={selectedSeason} onValuechange={setSelectedSeason}>
+                <SelectTrigger className="w-full sm:w-[200px]">
+                  <SelectValue placeholder="Select Season" />
+                </SelectTrigger>
+                <SelectContent>
+                  {seasons.map((season) => (
+                    <SelectItem key={season} value={season}>{season}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           </div>
         </div>
 
@@ -217,31 +264,27 @@ const Analytics = () => {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
-                <PieChart className="h-5 w-5 text-purple-600" />
+                <BarChart3 className="h-5 w-5 text-purple-600" />
                 <span>League Statistics</span>
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {analyticsData.leagueStats?.length > 0 && (
+              {analyticsData.leagueStats?.length > 0 ? (
                 <ResponsiveContainer width="100%" height={300}>
-                  <RechartsPieChart>
-                    <Pie
-                      data={analyticsData.leagueStats}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                      outerRadius={80}
-                      fill="#8884d8"
-                      dataKey="value"
-                    >
+                  <BarChart data={analyticsData.leagueStats} layout="vertical" margin={{ right: 20 }}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis type="number" />
+                    <YAxis type="category" dataKey="name" width={80} tick={{ fontSize: 12 }} />
+                    <Tooltip cursor={{fill: 'rgba(238, 242, 255, 0.5)'}}/>
+                    <Bar dataKey="value" name="Value">
                       {analyticsData.leagueStats.map((entry: any, index: number) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
-                    </Pie>
-                    <Tooltip />
-                  </RechartsPieChart>
+                    </Bar>
+                  </BarChart>
                 </ResponsiveContainer>
+              ) : (
+                <p className="text-center text-gray-500 py-10">No league statistics available.</p>
               )}
             </CardContent>
           </Card>
