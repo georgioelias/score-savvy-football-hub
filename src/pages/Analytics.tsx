@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Link } from 'react-router-dom';
-import { Trophy, TrendingUp, BarChart3, PieChart } from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Cell } from 'recharts';
+import { Trophy, TrendingUp, BarChart3, PieChart, Users, Target, Award, Activity } from 'lucide-react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Cell, PieChart as RechartsPieChart, RadialBarChart, RadialBar } from 'recharts';
 import FootballAPI from '../utils/footballApi';
 
 const Analytics = () => {
@@ -13,6 +13,7 @@ const Analytics = () => {
   const [selectedTeam1, setSelectedTeam1] = useState('');
   const [selectedTeam2, setSelectedTeam2] = useState('');
   const [analyticsData, setAnalyticsData] = useState<any>({});
+  const [allSeasonsData, setAllSeasonsData] = useState<any>({});
   const [loading, setLoading] = useState(true);
 
   const api = new FootballAPI();
@@ -48,6 +49,7 @@ const Analytics = () => {
       setSelectedSeason(newSeason);
       if (!newSeason) {
         setAnalyticsData({});
+        setAllSeasonsData({});
         setLoading(false);
       }
     } catch (error) {
@@ -62,8 +64,18 @@ const Analytics = () => {
     if (!selectedSeason) return;
     setLoading(true);
     try {
+      // Load current season data
       const data = await api.fetchAnalyticsData(selectedCompetition, selectedSeason);
       setAnalyticsData(data);
+      
+      // Load all seasons data for comprehensive team stats
+      const allSeasons = await Promise.all(
+        seasons.map(season => api.fetchAnalyticsData(selectedCompetition, season))
+      );
+      setAllSeasonsData({
+        seasons: seasons,
+        data: allSeasons
+      });
       
       // Set default teams for comparison
       if (data.topTeams?.length >= 2) {
@@ -97,28 +109,57 @@ const Analytics = () => {
     ];
   };
 
-  const getSeasonTrendData = () => {
-    // Generate trend data based on recent matches
-    const matches = analyticsData.recentMatches || [];
-    const monthlyData: { [key: string]: { goals: number, matches: number } } = {};
-
-    matches.forEach((match: any) => {
-      const date = new Date(match.utcDate);
-      const month = date.toLocaleString('default', { month: 'short' });
+  const getPerformanceTrends = () => {
+    if (!allSeasonsData.data || !allSeasonsData.seasons) return [];
+    
+    return allSeasonsData.seasons.map((season: string, index: number) => {
+      const seasonData = allSeasonsData.data[index];
+      const topTeam = seasonData.topTeams?.[0];
+      const avgPoints = seasonData.topTeams?.reduce((sum: number, team: any) => sum + (team.points || 0), 0) / (seasonData.topTeams?.length || 1);
       
-      if (!monthlyData[month]) {
-        monthlyData[month] = { goals: 0, matches: 0 };
-      }
-      
-      monthlyData[month].goals += (match.score?.fullTime?.home || 0) + (match.score?.fullTime?.away || 0);
-      monthlyData[month].matches += 1;
-    });
+      return {
+        season: season.replace('-', '/'),
+        topPoints: topTeam?.points || 0,
+        avgPoints: Math.round(avgPoints || 0),
+        totalGoals: seasonData.totalGoals || 0,
+        avgGoalsPerMatch: seasonData.avgGoalsPerMatch || 0
+      };
+    }).reverse();
+  };
 
-    return Object.entries(monthlyData).map(([month, data]) => ({
-      month,
-      goals: data.goals,
-      avgGoals: (data.goals / data.matches).toFixed(1)
+  const getDefensiveStats = () => {
+    const teams = analyticsData.topTeams || [];
+    return teams.slice(0, 5).map((team: any) => ({
+      name: team.team.name.length > 10 ? team.team.name.substring(0, 10) + '...' : team.team.name,
+      cleanSheets: Math.max(0, team.playedGames - Math.ceil(team.goalsAgainst / 2)),
+      goalsAgainst: team.goalsAgainst,
+      defensive: Math.max(0, 100 - (team.goalsAgainst * 5))
     }));
+  };
+
+  const getWinRateData = () => {
+    const teams = analyticsData.topTeams || [];
+    return teams.slice(0, 8).map((team: any) => ({
+      name: team.team.name.length > 8 ? team.team.name.substring(0, 8) + '...' : team.team.name,
+      winRate: team.playedGames > 0 ? Math.round((team.won / team.playedGames) * 100) : 0,
+      wins: team.won,
+      played: team.playedGames
+    }));
+  };
+
+  const getRecentMatches = () => {
+    const matches = analyticsData.recentMatches || [];
+    // Get unique matchdays
+    const matchdays = [...new Set(matches.map((m: any) => m.matchday))].filter(Boolean);
+    
+    // If only one matchday, show all matches without filter
+    if (matchdays.length <= 1) {
+      return matches.slice(0, 10);
+    }
+    
+    // Otherwise show matches from the latest matchday
+    const latestMatchday = Math.max(...matchdays);
+    return matches.filter((m: any) => m.matchday === latestMatchday).slice(0, 10);
   };
 
   if (loading) {
@@ -132,7 +173,10 @@ const Analytics = () => {
     );
   }
 
-  const seasonTrendData = getSeasonTrendData();
+  const performanceTrends = getPerformanceTrends();
+  const defensiveStats = getDefensiveStats();
+  const winRateData = getWinRateData();
+  const recentMatches = getRecentMatches();
   const comparisonData = getTeamComparisonData();
   const availableTeams = analyticsData.topTeams?.map((t: any) => t.team.name) || [];
 
@@ -184,26 +228,145 @@ const Analytics = () => {
           </div>
         </div>
 
-        {/* Season Overview */}
-        {seasonTrendData.length > 0 && (
+        {/* Performance Trends Across Seasons */}
+        {performanceTrends.length > 0 && (
           <div className="mb-8">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
-                  <TrendingUp className="h-5 w-5 text-green-600" />
-                  <span>Goals Trend - {competitions[selectedCompetition]}</span>
+                  <Activity className="h-5 w-5 text-purple-600" />
+                  <span>Performance Trends - {competitions[selectedCompetition]}</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={seasonTrendData}>
+                  <LineChart data={performanceTrends}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="month" />
+                    <XAxis dataKey="season" />
                     <YAxis />
                     <Tooltip />
-                    <Line type="monotone" dataKey="goals" stroke="#10b981" strokeWidth={2} name="Total Goals" />
+                    <Line type="monotone" dataKey="topPoints" stroke="#8b5cf6" strokeWidth={2} name="Winner Points" />
+                    <Line type="monotone" dataKey="avgPoints" stroke="#06b6d4" strokeWidth={2} name="Avg Points" />
                   </LineChart>
                 </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Enhanced Team Statistics Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
+          {/* Top Performers Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Award className="h-5 w-5 text-yellow-600" />
+                <span>Top Performers</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {analyticsData.topTeams?.slice(0, 5).map((team: any, index: number) => (
+                  <div key={team.team.name} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div className="flex items-center space-x-3">
+                      <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                        index === 0 ? 'bg-yellow-500 text-white' : 
+                        index === 1 ? 'bg-gray-400 text-white' : 
+                        index === 2 ? 'bg-orange-400 text-white' : 'bg-blue-100 text-blue-800'
+                      }`}>
+                        {index + 1}
+                      </span>
+                      <div>
+                        <p className="font-semibold text-sm">{team.team.name}</p>
+                        <p className="text-xs text-gray-600">{team.points} pts</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-medium text-green-600">+{team.goalDifference}</p>
+                      <p className="text-xs text-gray-500">{team.won}W {team.draw}D {team.lost}L</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Defensive Excellence Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Target className="h-5 w-5 text-blue-600" />
+                <span>Defensive Stats</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={200}>
+                <BarChart data={defensiveStats} layout="vertical">
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis type="number" />
+                  <YAxis type="category" dataKey="name" width={60} tick={{ fontSize: 11 }} />
+                  <Tooltip />
+                  <Bar dataKey="defensive" fill="#3b82f6" name="Defensive Rating" />
+                </BarChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+
+          {/* Win Rate Analysis Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <TrendingUp className="h-5 w-5 text-green-600" />
+                <span>Win Rates</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={200}>
+                <RadialBarChart data={winRateData} innerRadius="10%" outerRadius="80%">
+                  <RadialBar dataKey="winRate" cornerRadius={10} fill="#10b981" />
+                  <Tooltip formatter={(value) => [`${value}%`, 'Win Rate']} />
+                </RadialBarChart>
+              </ResponsiveContainer>
+              <div className="mt-4 grid grid-cols-2 gap-2">
+                {winRateData.slice(0, 4).map((team: any) => (
+                  <div key={team.name} className="text-center p-2 bg-green-50 rounded">
+                    <p className="font-semibold text-xs">{team.name}</p>
+                    <p className="text-lg font-bold text-green-600">{team.winRate}%</p>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Recent Results */}
+        {recentMatches.length > 0 && (
+          <div className="mb-8">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Users className="h-5 w-5 text-orange-600" />
+                  <span>Recent Results</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {recentMatches.map((match: any) => (
+                    <div key={match.id} className="p-4 border rounded-lg bg-white">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-sm font-medium">{match.homeTeam.name}</span>
+                        <span className="text-lg font-bold">{match.score.fullTime.home}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm font-medium">{match.awayTeam.name}</span>
+                        <span className="text-lg font-bold">{match.score.fullTime.away}</span>
+                      </div>
+                      <div className="text-xs text-gray-500 mt-2">
+                        {new Date(match.utcDate).toLocaleDateString()}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </CardContent>
             </Card>
           </div>
