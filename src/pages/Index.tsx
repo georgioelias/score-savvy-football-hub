@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { RadioTower, BarChart3, MousePointer, Database, BrainCircuit } from 'lucide-react';
+import { RadioTower, BarChart3, MousePointer, Database, BrainCircuit, Table } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import FeatureCard from './index-components/FeatureCard';
@@ -67,11 +67,7 @@ const Index = () => {
                 description="Get real-time updates from ongoing matches and browse recent results across major European leagues."
               />
               <FeatureCard
-                icon={<img 
-                  src="/lovable-uploads/b93b2393-78cb-4d7c-b0a3-45257a738ed2.png" 
-                  alt="Football Icon" 
-                  className="w-10 h-10"
-                />}
+                icon={<Table className="h-10 w-10 text-green-600" />}
                 title="In-Depth Standings"
                 description="Track your favorite team's progress with detailed league tables, including form, goal difference, and more."
               />
