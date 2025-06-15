@@ -14,6 +14,7 @@ const LiveData = () => {
   const [selectedCompetition, setSelectedCompetition] = useState('PL');
   const [selectedSeason, setSelectedSeason] = useState('2024');
   const [autoRefresh, setAutoRefresh] = useState(false);
+  const [selectedMatchday, setSelectedMatchday] = useState<string>('all');
 
   const tabManager = new TabManager(activeTab, setActiveTab, setTabData, setLoading);
 
@@ -53,6 +54,18 @@ const LiveData = () => {
     }
     return () => clearInterval(interval);
   }, [autoRefresh, activeTab, selectedCompetition, selectedSeason]);
+
+  const getAvailableMatchdays = () => {
+    const matches = tabData.matches || [];
+    const matchdays = [...new Set(matches.map((match: any) => match.matchday).filter(Boolean))];
+    return matchdays.sort((a: number, b: number) => b - a); // Latest first
+  };
+
+  const getFilteredMatches = () => {
+    const matches = tabData.matches || [];
+    if (selectedMatchday === 'all') return matches;
+    return matches.filter((match: any) => match.matchday?.toString() === selectedMatchday);
+  };
 
   const renderTabContent = () => {
     if (loading) {
@@ -147,6 +160,9 @@ const LiveData = () => {
                           'vs'
                         }
                       </div>
+                      {match.matchday && (
+                        <div className="text-xs text-gray-500">MD {match.matchday}</div>
+                      )}
                     </div>
                     <div className="text-left flex items-center space-x-2">
                       <p className="font-semibold">{match.awayTeam.name}</p>
@@ -167,6 +183,18 @@ const LiveData = () => {
                     </p>
                   </div>
                 </div>
+                {match.goalscorers && match.goalscorers.length > 0 && (
+                  <div className="mt-3 pt-3 border-t">
+                    <p className="text-sm font-medium text-gray-700 mb-1">Goalscorers:</p>
+                    <div className="text-sm text-gray-600">
+                      {match.goalscorers.map((scorer: any, index: number) => (
+                        <span key={index} className="mr-3">
+                          {scorer.player} {scorer.minute}'
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           ))
@@ -374,18 +402,38 @@ const LiveData = () => {
   };
 
   const renderRecentResults = () => {
-    const matches = tabData.matches?.filter((match: any) => match.status === 'FINISHED') || [];
-    console.log('Rendering recent results:', matches);
+    const filteredMatches = getFilteredMatches().filter((match: any) => match.status === 'FINISHED');
+    const availableMatchdays = getAvailableMatchdays();
+    
+    console.log('Rendering recent results:', filteredMatches);
     
     return (
       <div className="space-y-4">
-        {matches.length === 0 ? (
+        {/* Matchday Filter */}
+        {availableMatchdays.length > 0 && (
+          <div className="flex items-center space-x-4 mb-4">
+            <span className="text-sm font-medium text-gray-700">Filter by Matchday:</span>
+            <Select value={selectedMatchday} onValueChange={setSelectedMatchday}>
+              <SelectTrigger className="w-[150px]">
+                <SelectValue placeholder="All Matchdays" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Matchdays</SelectItem>
+                {availableMatchdays.map((md) => (
+                  <SelectItem key={md} value={md.toString()}>Matchday {md}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+
+        {filteredMatches.length === 0 ? (
           <div className="text-center py-12">
             <RefreshCw className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <p className="text-gray-500 text-lg">No recent results available</p>
           </div>
         ) : (
-          matches.slice(0, 10).map((match: any) => (
+          filteredMatches.slice(0, 20).map((match: any) => (
             <Card key={match.id} className="hover:shadow-md transition-shadow">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
@@ -400,6 +448,9 @@ const LiveData = () => {
                       <div className="text-xl font-bold">
                         {match.score.fullTime.home} - {match.score.fullTime.away}
                       </div>
+                      {match.matchday && (
+                        <div className="text-xs text-gray-500">MD {match.matchday}</div>
+                      )}
                     </div>
                     <div className="text-left flex items-center space-x-2">
                       <p className="font-semibold">{match.awayTeam.name}</p>
@@ -418,6 +469,18 @@ const LiveData = () => {
                     </p>
                   </div>
                 </div>
+                {match.goalscorers && match.goalscorers.length > 0 && (
+                  <div className="mt-3 pt-3 border-t">
+                    <p className="text-sm font-medium text-gray-700 mb-1">Goalscorers:</p>
+                    <div className="text-sm text-gray-600">
+                      {match.goalscorers.map((scorer: any, index: number) => (
+                        <span key={index} className="mr-3">
+                          {scorer.player} {scorer.minute}'
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           ))
