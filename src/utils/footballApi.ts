@@ -21,74 +21,68 @@ class FootballAPI {
       return cached.data;
     }
 
-    try {
-      console.log('Fetching from API:', `${this.baseURL}${endpoint}`);
-      
-      // Try direct API call first
-      const response = await fetch(`${this.baseURL}${endpoint}`, {
+    console.log('Attempting to fetch from API:', `${this.baseURL}${endpoint}`);
+    
+    // Try multiple CORS proxy approaches
+    const proxies = [
+      // Direct call (will likely fail due to CORS)
+      () => fetch(`${this.baseURL}${endpoint}`, {
         headers: {
           'X-Auth-Token': this.apiKey,
-          'Content-Type': 'application/json'
         }
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Successfully fetched real data from API:', endpoint, data);
-        this.cache.set(cacheKey, { data, timestamp: Date.now() });
-        return data;
-      } else {
-        console.log('Direct API call failed, trying with CORS proxy...');
-        throw new Error(`API Error: ${response.status}`);
-      }
-    } catch (error) {
-      console.log('Direct call failed, trying CORS proxy...');
-      
+      }),
+      // Try with different CORS proxy
+      () => fetch(`https://corsproxy.io/?${encodeURIComponent(`${this.baseURL}${endpoint}`)}`, {
+        headers: {
+          'X-Auth-Token': this.apiKey,
+        }
+      }),
+      // Try with another proxy
+      () => fetch(`https://cors-anywhere.herokuapp.com/${this.baseURL}${endpoint}`, {
+        headers: {
+          'X-Auth-Token': this.apiKey,
+        }
+      })
+    ];
+
+    for (let i = 0; i < proxies.length; i++) {
       try {
-        // Use CORS proxy as fallback
-        const proxyUrl = 'https://api.allorigins.win/raw?url=';
-        const targetUrl = `${this.baseURL}${endpoint}`;
-        const response = await fetch(`${proxyUrl}${encodeURIComponent(targetUrl)}`, {
-          headers: {
-            'X-Auth-Token': this.apiKey
-          }
-        });
+        console.log(`Trying proxy method ${i + 1}...`);
+        const response = await proxies[i]();
         
         if (response.ok) {
           const data = await response.json();
-          console.log('Successfully fetched real data via proxy:', endpoint, data);
+          console.log('Successfully fetched real data:', endpoint, data);
           this.cache.set(cacheKey, { data, timestamp: Date.now() });
           return data;
         } else {
-          throw new Error(`Proxy API Error: ${response.status}`);
+          console.log(`Proxy ${i + 1} failed with status:`, response.status);
         }
-      } catch (proxyError) {
-        console.error('All API calls failed, using fallback data for:', endpoint, proxyError);
-        return this.getFallbackData(endpoint);
+      } catch (error) {
+        console.log(`Proxy ${i + 1} failed with error:`, error);
       }
     }
+
+    console.log('All API attempts failed, using realistic fallback data for:', endpoint);
+    return this.getFallbackData(endpoint);
   }
 
   async fetchMatches(season?: string): Promise<any> {
-    // Get today's matches or all matches with season filter
     const seasonParam = season ? `?season=${season}` : '';
     return await this.fetchData(`/matches${seasonParam}`);
   }
 
   async fetchStandings(competition = 'PL', season?: string): Promise<any> {
-    // Use correct v4 endpoint format: /competitions/{id}/standings
     const seasonParam = season ? `?season=${season}` : '';
     return await this.fetchData(`/competitions/${competition}/standings${seasonParam}`);
   }
 
   async fetchTeams(competition = 'PL', season?: string): Promise<any> {
-    // Use correct v4 endpoint format: /competitions/{id}/teams
     const seasonParam = season ? `?season=${season}` : '';
     return await this.fetchData(`/competitions/${competition}/teams${seasonParam}`);
   }
 
   async fetchCompetitionMatches(competition = 'PL', season?: string): Promise<any> {
-    // Use correct v4 endpoint format: /competitions/{id}/matches
     const seasonParam = season ? `?season=${season}` : '';
     return await this.fetchData(`/competitions/${competition}/matches${seasonParam}`);
   }
@@ -102,7 +96,7 @@ class FootballAPI {
                          endpoint.includes('BL1') ? 'Bundesliga' : 'Premier League';
       
       if (endpoint.includes('PD')) {
-        // Complete La Liga standings (20 teams)
+        // Real Madrid leading La Liga
         return {
           standings: [{
             table: [
@@ -130,7 +124,7 @@ class FootballAPI {
           }]
         };
       } else if (endpoint.includes('SA')) {
-        // Complete Serie A standings (20 teams)
+        // Inter Milan leading Serie A
         return {
           standings: [{
             table: [
@@ -158,7 +152,7 @@ class FootballAPI {
           }]
         };
       } else if (endpoint.includes('BL1')) {
-        // Complete Bundesliga standings (18 teams)
+        // Bayern Munich leading Bundesliga
         return {
           standings: [{
             table: [
@@ -184,7 +178,7 @@ class FootballAPI {
           }]
         };
       } else {
-        // Complete Premier League standings (20 teams)
+        // Liverpool leading Premier League
         return {
           standings: [{
             table: [
@@ -244,7 +238,7 @@ class FootballAPI {
     }
     
     if (endpoint.includes('teams')) {
-      // Return all teams based on competition
+      // Return realistic teams for the competition
       if (endpoint.includes('PD')) {
         return {
           teams: [
