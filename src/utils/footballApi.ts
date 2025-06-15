@@ -64,6 +64,20 @@ class FootballAPI {
     }
   }
 
+  async fetchEventStats(eventId: string): Promise<{ eventstats: any[] }> {
+    console.log(`Fetching event stats for event ID: ${eventId}`);
+    try {
+      const url = `${this.baseUrl}/lookupeventstats.php?id=${eventId}`;
+      const response = await fetch(url);
+      const data = await response.json();
+      
+      return { eventstats: data.eventstats || [] };
+    } catch (error) {
+      console.error('Error fetching event stats:', error);
+      return { eventstats: [] };
+    }
+  }
+
   async fetchTeams(competition = 'PL', season?: string): Promise<{ teams: any[] }> {
     console.log(`Fetching teams for competition: ${competition}, season: ${season}`);
     
