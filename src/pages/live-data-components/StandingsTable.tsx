@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Trophy } from 'lucide-react';
+import { Trophy, Users } from 'lucide-react';
 import { Standing } from '@/types/football';
 
 interface StandingsTableProps {
@@ -9,7 +9,13 @@ interface StandingsTableProps {
   seasonName: string;
 }
 
-const getPositionColor = (position: number) => {
+const getPositionColor = (position: number, isGroupStage: boolean = false) => {
+  if (isGroupStage) {
+    if (position <= 2) return 'text-green-600 font-bold bg-green-50'; // Qualification
+    if (position <= 4) return 'text-blue-600 font-bold bg-blue-50'; // Europa League
+    return 'text-gray-600 bg-gray-50'; // Elimination
+  }
+  
   if (position <= 4) return 'text-green-600 font-bold bg-green-50'; // Champions League
   if (position <= 6) return 'text-blue-600 font-bold bg-blue-50'; // Europa League
   if (position >= 18) return 'text-red-600 font-bold bg-red-50'; // Relegation
@@ -21,18 +27,27 @@ const StandingsTable: React.FC<StandingsTableProps> = ({ standings, competitionN
     return (
       <div className="text-center py-12">
         <Trophy className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-        <p className="text-gray-500 text-lg">No standings data available.</p>
+        <p className="text-gray-500 text-lg">No standings data available for this season.</p>
+        <p className="text-gray-400 text-sm mt-2">This might be due to limited API data for {seasonName}</p>
       </div>
     );
   }
 
+  const isGroupStage = competitionName.includes('Champions League') || competitionName.includes('Europa League');
+  const tableTitle = isGroupStage ? 'Group Stage Standings' : 'League Table';
+
   return (
     <div className="space-y-4">
       <div className="bg-gradient-to-r from-green-50 to-blue-50 p-4 rounded-lg">
-        <h3 className="text-lg font-semibold text-gray-900">
-          {competitionName} - {seasonName}
-        </h3>
-        <p className="text-sm text-gray-600 mt-1">Complete league table with {standings.length} teams.</p>
+        <div className="flex items-center space-x-2">
+          {isGroupStage ? <Users className="h-5 w-5 text-blue-600" /> : <Trophy className="h-5 w-5 text-green-600" />}
+          <h3 className="text-lg font-semibold text-gray-900">
+            {competitionName} - {seasonName}
+          </h3>
+        </div>
+        <p className="text-sm text-gray-600 mt-1">
+          {isGroupStage ? `${tableTitle} with ${standings.length} teams` : `Complete league table with ${standings.length} teams`}
+        </p>
       </div>
 
       <div className="overflow-x-auto bg-white rounded-lg shadow">
@@ -55,7 +70,7 @@ const StandingsTable: React.FC<StandingsTableProps> = ({ standings, competitionN
           <tbody>
             {standings.map((team) => (
               <tr key={team.position} className="border-b hover:bg-gray-50 transition-colors">
-                <td className={`p-3 font-medium ${getPositionColor(team.position)}`}>{team.position}</td>
+                <td className={`p-3 font-medium ${getPositionColor(team.position, isGroupStage)}`}>{team.position}</td>
                 <td className="p-3">
                   <div className="flex items-center space-x-3">
                     {team.team.crest && (
@@ -104,9 +119,19 @@ const StandingsTable: React.FC<StandingsTableProps> = ({ standings, competitionN
       <div className="bg-gray-50 p-4 rounded-lg">
         <h4 className="font-semibold text-gray-900 mb-2">Legend</h4>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm">
-          <div className="flex items-center space-x-2"><div className="w-4 h-4 bg-green-100 border border-green-300 rounded"></div><span>Champions League</span></div>
-          <div className="flex items-center space-x-2"><div className="w-4 h-4 bg-blue-100 border border-blue-300 rounded"></div><span>Europa League</span></div>
-          <div className="flex items-center space-x-2"><div className="w-4 h-4 bg-red-100 border border-red-300 rounded"></div><span>Relegation</span></div>
+          {isGroupStage ? (
+            <>
+              <div className="flex items-center space-x-2"><div className="w-4 h-4 bg-green-100 border border-green-300 rounded"></div><span>Round of 16</span></div>
+              <div className="flex items-center space-x-2"><div className="w-4 h-4 bg-blue-100 border border-blue-300 rounded"></div><span>Europa League</span></div>
+              <div className="flex items-center space-x-2"><div className="w-4 h-4 bg-gray-100 border border-gray-300 rounded"></div><span>Eliminated</span></div>
+            </>
+          ) : (
+            <>
+              <div className="flex items-center space-x-2"><div className="w-4 h-4 bg-green-100 border border-green-300 rounded"></div><span>Champions League</span></div>
+              <div className="flex items-center space-x-2"><div className="w-4 h-4 bg-blue-100 border border-blue-300 rounded"></div><span>Europa League</span></div>
+              <div className="flex items-center space-x-2"><div className="w-4 h-4 bg-red-100 border border-red-300 rounded"></div><span>Relegation</span></div>
+            </>
+          )}
         </div>
       </div>
     </div>

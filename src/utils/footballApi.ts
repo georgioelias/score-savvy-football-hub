@@ -212,34 +212,55 @@ class FootballAPI {
       };
     }
     
-    console.log('API returned no table data, using mock data');
-    return this.getMockStandingsData(competition);
+    console.log('API returned no table data, using mock data for', competition, season);
+    return this.getMockStandingsData(competition, season);
   }
 
-  private getMockStandingsData(competition: string): any {
-    const mockTables: { [key: string]: any[] } = {
-      'CL': [
-        { position: 1, team: { name: 'Manchester City', tla: 'MCI', crest: 'https://www.thesportsdb.com/images/media/team/badge/manchester_city.png' }, playedGames: 6, won: 5, draw: 1, lost: 0, points: 16, goalsFor: 15, goalsAgainst: 3, goalDifference: 12, form: 'WWWDW' },
-        { position: 2, team: { name: 'Real Madrid', tla: 'RMA', crest: 'https://www.thesportsdb.com/images/media/team/badge/real_madrid.png' }, playedGames: 6, won: 4, draw: 2, lost: 0, points: 14, goalsFor: 12, goalsAgainst: 4, goalDifference: 8, form: 'WDWWD' }
-      ],
-      'EL': [
-        { position: 1, team: { name: 'Arsenal', tla: 'ARS', crest: 'https://www.thesportsdb.com/images/media/team/badge/arsenal.png' }, playedGames: 6, won: 5, draw: 1, lost: 0, points: 16, goalsFor: 13, goalsAgainst: 2, goalDifference: 11, form: 'WWWDW' }
-      ]
+  private getMockStandingsData(competition: string, season?: string): any {
+    const mockTables: { [key: string]: any } = {
+      'CL': {
+        'GROUP_STAGE': [
+          { position: 1, team: { name: 'Manchester City', tla: 'MCI', crest: 'https://www.thesportsdb.com/images/media/team/badge/manchester_city.png' }, playedGames: 6, won: 5, draw: 1, lost: 0, points: 16, goalsFor: 15, goalsAgainst: 3, goalDifference: 12, form: 'WWWDW' },
+          { position: 2, team: { name: 'Real Madrid', tla: 'RMA', crest: 'https://www.thesportsdb.com/images/media/team/badge/real_madrid.png' }, playedGames: 6, won: 4, draw: 2, lost: 0, points: 14, goalsFor: 12, goalsAgainst: 4, goalDifference: 8, form: 'WDWWD' },
+          { position: 3, team: { name: 'Barcelona', tla: 'BAR', crest: 'https://www.thesportsdb.com/images/media/team/badge/barcelona.png' }, playedGames: 6, won: 4, draw: 1, lost: 1, points: 13, goalsFor: 11, goalsAgainst: 5, goalDifference: 6, form: 'WWDWL' },
+          { position: 4, team: { name: 'Bayern Munich', tla: 'BAY', crest: 'https://www.thesportsdb.com/images/media/team/badge/bayern_munich.png' }, playedGames: 6, won: 4, draw: 0, lost: 2, points: 12, goalsFor: 14, goalsAgainst: 8, goalDifference: 6, form: 'WWLWL' }
+        ]
+      },
+      'EL': {
+        'GROUP_STAGE': [
+          { position: 1, team: { name: 'Arsenal', tla: 'ARS', crest: 'https://www.thesportsdb.com/images/media/team/badge/arsenal.png' }, playedGames: 6, won: 5, draw: 1, lost: 0, points: 16, goalsFor: 13, goalsAgainst: 2, goalDifference: 11, form: 'WWWDW' },
+          { position: 2, team: { name: 'Manchester United', tla: 'MUN', crest: 'https://www.thesportsdb.com/images/media/team/badge/manchester_united.png' }, playedGames: 6, won: 4, draw: 1, lost: 1, points: 13, goalsFor: 10, goalsAgainst: 4, goalDifference: 6, form: 'WDWWL' },
+          { position: 3, team: { name: 'Roma', tla: 'ROM', crest: 'https://www.thesportsdb.com/images/media/team/badge/roma.png' }, playedGames: 6, won: 3, draw: 2, lost: 1, points: 11, goalsFor: 8, goalsAgainst: 5, goalDifference: 3, form: 'DWWLD' },
+          { position: 4, team: { name: 'Ajax', tla: 'AJA', crest: 'https://www.thesportsdb.com/images/media/team/badge/ajax.png' }, playedGames: 6, won: 2, draw: 3, lost: 1, points: 9, goalsFor: 7, goalsAgainst: 4, goalDifference: 3, form: 'DWDWL' }
+        ]
+      },
+      // Default fallback data for missing league seasons
+      'PD': season === '2023-2024' ? [
+        { position: 1, team: { name: 'Real Madrid', tla: 'RMA', crest: 'https://www.thesportsdb.com/images/media/team/badge/real_madrid.png' }, playedGames: 38, won: 29, draw: 6, lost: 3, points: 95, goalsFor: 87, goalsAgainst: 26, goalDifference: 61, form: 'WWWDW' },
+        { position: 2, team: { name: 'Barcelona', tla: 'BAR', crest: 'https://www.thesportsdb.com/images/media/team/badge/barcelona.png' }, playedGames: 38, won: 27, draw: 7, lost: 4, points: 85, goalsFor: 79, goalsAgainst: 32, goalDifference: 47, form: 'WDWWL' },
+        { position: 3, team: { name: 'Girona', tla: 'GIR', crest: 'https://www.thesportsdb.com/images/media/team/badge/girona.png' }, playedGames: 38, won: 25, draw: 8, lost: 5, points: 81, goalsFor: 85, goalsAgainst: 46, goalDifference: 39, form: 'WWLDW' }
+      ] : [],
+      'FL1': season === '2023-2024' ? [
+        { position: 1, team: { name: 'Paris Saint-Germain', tla: 'PSG', crest: 'https://www.thesportsdb.com/images/media/team/badge/psg.png' }, playedGames: 34, won: 26, draw: 6, lost: 2, points: 84, goalsFor: 89, goalsAgainst: 35, goalDifference: 54, form: 'WWDWW' },
+        { position: 2, team: { name: 'AS Monaco', tla: 'MON', crest: 'https://www.thesportsdb.com/images/media/team/badge/monaco.png' }, playedGames: 34, won: 21, draw: 9, lost: 4, points: 72, goalsFor: 68, goalsAgainst: 34, goalDifference: 34, form: 'WDWWD' },
+        { position: 3, team: { name: 'Brest', tla: 'BRE', crest: 'https://www.thesportsdb.com/images/media/team/badge/brest.png' }, playedGames: 34, won: 18, draw: 11, lost: 5, points: 65, goalsFor: 56, goalsAgainst: 38, goalDifference: 18, form: 'DWDWL' }
+      ] : []
     };
 
-    const table = mockTables[competition] || mockTables['CL'];
+    const competitionType = (competition === 'CL' || competition === 'EL') ? 'GROUP_STAGE' : 'REGULAR_SEASON';
+    const table = mockTables[competition]?.[competitionType] || mockTables[competition] || [];
     
     return {
       standings: [{
-        stage: "REGULAR_SEASON", 
-        type: "TOTAL",
+        stage: competitionType,
+        type: competitionType === 'GROUP_STAGE' ? 'GROUP' : 'TOTAL',
         table: table
       }],
       competition: { 
         name: this.getCompetitionName(competition), 
         code: competition 
       },
-      season: "2024-2025"
+      season: season || "2024-2025"
     };
   }
 
