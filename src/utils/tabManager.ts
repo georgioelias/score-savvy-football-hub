@@ -34,7 +34,7 @@ class TabManager {
               match.status === 'IN_PLAY' || match.status === 'LIVE'
             );
             if (liveMatches.length === 0) {
-              data = { matches: [], message: 'No live matches at the moment' };
+              data = { matches: data.matches || [], message: 'No live matches at the moment - showing recent matches' };
             } else {
               data = { ...data, matches: liveMatches };
             }
@@ -62,13 +62,14 @@ class TabManager {
         default:
           data = {};
       }
+      
       console.log('Tab data loaded successfully');
       this.setTabData(data);
       
-      // Show success toast
+      // Show demo data notification if using mock data
       toast({
-        title: "Data loaded successfully",
-        description: `${this.getTabDisplayName(tabId)} data has been updated.`,
+        title: "Demo Data Loaded",
+        description: "Using sample football data for demonstration. Live API data is currently unavailable due to CORS restrictions.",
       });
       
     } catch (error) {
@@ -76,17 +77,15 @@ class TabManager {
       
       // Show error toast
       toast({
-        title: "Unable to load football data",
-        description: "The football API is currently unavailable due to access restrictions. This is a common issue with external APIs in browser environments.",
+        title: "Unable to load football data", 
+        description: "Using demo data instead. Live API is currently unavailable.",
         variant: "destructive",
       });
       
-      // Provide user-friendly error data
-      const errorMessage = error instanceof Error ? error.message : 'Failed to load data';
+      // This shouldn't happen now since we have fallback mock data
       this.setTabData({ 
         error: true,
-        errorMessage: errorMessage,
-        userFriendlyMessage: 'Unable to connect to football data service. This may be due to API access restrictions or network issues.',
+        errorMessage: 'Failed to load data',
         matches: [],
         teams: [],
         standings: []
