@@ -24,12 +24,11 @@ class FootballAPI {
     try {
       console.log('Fetching from API:', `${this.baseURL}${endpoint}`);
       
-      // Use a more reliable CORS proxy
-      const proxyUrl = 'https://api.allorigins.win/raw?url=';
-      const targetUrl = `${this.baseURL}${endpoint}`;
-      const response = await fetch(`${proxyUrl}${encodeURIComponent(targetUrl)}`, {
+      // Try direct API call first
+      const response = await fetch(`${this.baseURL}${endpoint}`, {
         headers: {
-          'X-Auth-Token': this.apiKey
+          'X-Auth-Token': this.apiKey,
+          'Content-Type': 'application/json'
         }
       });
       
@@ -39,27 +38,59 @@ class FootballAPI {
         this.cache.set(cacheKey, { data, timestamp: Date.now() });
         return data;
       } else {
+        console.log('Direct API call failed, trying with CORS proxy...');
         throw new Error(`API Error: ${response.status}`);
       }
     } catch (error) {
-      console.error('API fetch failed, using fallback data for:', endpoint, error);
-      return this.getFallbackData(endpoint);
+      console.log('Direct call failed, trying CORS proxy...');
+      
+      try {
+        // Use CORS proxy as fallback
+        const proxyUrl = 'https://api.allorigins.win/raw?url=';
+        const targetUrl = `${this.baseURL}${endpoint}`;
+        const response = await fetch(`${proxyUrl}${encodeURIComponent(targetUrl)}`, {
+          headers: {
+            'X-Auth-Token': this.apiKey
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          console.log('Successfully fetched real data via proxy:', endpoint, data);
+          this.cache.set(cacheKey, { data, timestamp: Date.now() });
+          return data;
+        } else {
+          throw new Error(`Proxy API Error: ${response.status}`);
+        }
+      } catch (proxyError) {
+        console.error('All API calls failed, using fallback data for:', endpoint, proxyError);
+        return this.getFallbackData(endpoint);
+      }
     }
   }
 
   async fetchMatches(season?: string): Promise<any> {
+    // Get today's matches or all matches with season filter
     const seasonParam = season ? `?season=${season}` : '';
     return await this.fetchData(`/matches${seasonParam}`);
   }
 
   async fetchStandings(competition = 'PL', season?: string): Promise<any> {
+    // Use correct v4 endpoint format: /competitions/{id}/standings
     const seasonParam = season ? `?season=${season}` : '';
     return await this.fetchData(`/competitions/${competition}/standings${seasonParam}`);
   }
 
   async fetchTeams(competition = 'PL', season?: string): Promise<any> {
+    // Use correct v4 endpoint format: /competitions/{id}/teams
     const seasonParam = season ? `?season=${season}` : '';
     return await this.fetchData(`/competitions/${competition}/teams${seasonParam}`);
+  }
+
+  async fetchCompetitionMatches(competition = 'PL', season?: string): Promise<any> {
+    // Use correct v4 endpoint format: /competitions/{id}/matches
+    const seasonParam = season ? `?season=${season}` : '';
+    return await this.fetchData(`/competitions/${competition}/matches${seasonParam}`);
   }
 
   getFallbackData(endpoint: string): any {
@@ -226,7 +257,17 @@ class FootballAPI {
             { id: 7, name: 'Sevilla', founded: 1890, venue: 'Ramón Sánchez-Pizjuán', crest: 'https://crests.football-data.org/559.png' },
             { id: 8, name: 'Real Betis', founded: 1907, venue: 'Benito Villamarín', crest: 'https://crests.football-data.org/90.png' },
             { id: 9, name: 'Villarreal', founded: 1923, venue: 'Estadio de la Cerámica', crest: 'https://crests.football-data.org/94.png' },
-            { id: 10, name: 'Celta Vigo', founded: 1923, venue: 'Balaídos', crest: 'https://crests.football-data.org/558.png' }
+            { id: 10, name: 'Celta Vigo', founded: 1923, venue: 'Balaídos', crest: 'https://crests.football-data.org/558.png' },
+            { id: 11, name: 'Osasuna', founded: 1920, venue: 'El Sadar', crest: 'https://crests.football-data.org/79.png' },
+            { id: 12, name: 'Getafe', founded: 1983, venue: 'Coliseum Alfonso Pérez', crest: 'https://crests.football-data.org/82.png' },
+            { id: 13, name: 'Las Palmas', founded: 1949, venue: 'Estadio Gran Canaria', crest: 'https://crests.football-data.org/275.png' },
+            { id: 14, name: 'Mallorca', founded: 1916, venue: 'Visit Mallorca Estadi', crest: 'https://crests.football-data.org/1024.png' },
+            { id: 15, name: 'Rayo Vallecano', founded: 1924, venue: 'Campo de Fútbol de Vallecas', crest: 'https://crests.football-data.org/87.png' },
+            { id: 16, name: 'Cadiz', founded: 1910, venue: 'Nuevo Mirandilla', crest: 'https://crests.football-data.org/264.png' },
+            { id: 17, name: 'Girona', founded: 1930, venue: 'Estadi Municipal de Montilivi', crest: 'https://crests.football-data.org/298.png' },
+            { id: 18, name: 'Alaves', founded: 1921, venue: 'Mendizorrotza', crest: 'https://crests.football-data.org/263.png' },
+            { id: 19, name: 'Almeria', founded: 1989, venue: 'Power Horse Stadium', crest: 'https://crests.football-data.org/1071.png' },
+            { id: 20, name: 'Granada', founded: 1931, venue: 'Nuevo Los Cármenes', crest: 'https://crests.football-data.org/83.png' }
           ]
         };
       } else if (endpoint.includes('SA')) {
@@ -241,7 +282,17 @@ class FootballAPI {
             { id: 7, name: 'Atalanta', founded: 1907, venue: 'Gewiss Stadium', crest: 'https://crests.football-data.org/102.png' },
             { id: 8, name: 'Fiorentina', founded: 1926, venue: 'Artemio Franchi', crest: 'https://crests.football-data.org/99.png' },
             { id: 9, name: 'Bologna', founded: 1909, venue: 'Renato Dall\'Ara', crest: 'https://crests.football-data.org/103.png' },
-            { id: 10, name: 'Torino', founded: 1906, venue: 'Grande Torino', crest: 'https://crests.football-data.org/586.png' }
+            { id: 10, name: 'Torino', founded: 1906, venue: 'Grande Torino', crest: 'https://crests.football-data.org/586.png' },
+            { id: 11, name: 'Sassuolo', founded: 1920, venue: 'Mapei Stadium', crest: 'https://crests.football-data.org/471.png' },
+            { id: 12, name: 'Monza', founded: 1912, venue: 'U-Power Stadium', crest: 'https://crests.football-data.org/1579.png' },
+            { id: 13, name: 'Lecce', founded: 1908, venue: 'Via del Mare', crest: 'https://crests.football-data.org/1106.png' },
+            { id: 14, name: 'Udinese', founded: 1896, venue: 'Dacia Arena', crest: 'https://crests.football-data.org/115.png' },
+            { id: 15, name: 'Genoa', founded: 1893, venue: 'Luigi Ferraris', crest: 'https://crests.football-data.org/107.png' },
+            { id: 16, name: 'Empoli', founded: 1920, venue: 'Carlo Castellani', crest: 'https://crests.football-data.org/445.png' },
+            { id: 17, name: 'Verona', founded: 1903, venue: 'Stadio Marcantonio Bentegodi', crest: 'https://crests.football-data.org/450.png' },
+            { id: 18, name: 'Cagliari', founded: 1920, venue: 'Unipol Domus', crest: 'https://crests.football-data.org/104.png' },
+            { id: 19, name: 'Frosinone', founded: 1928, venue: 'Benito Stirpe', crest: 'https://crests.football-data.org/472.png' },
+            { id: 20, name: 'Salernitana', founded: 1919, venue: 'Arechi', crest: 'https://crests.football-data.org/455.png' }
           ]
         };
       } else if (endpoint.includes('BL1')) {
@@ -256,7 +307,15 @@ class FootballAPI {
             { id: 7, name: 'Borussia Monchengladbach', founded: 1900, venue: 'Borussia-Park', crest: 'https://crests.football-data.org/18.png' },
             { id: 8, name: 'VfB Stuttgart', founded: 1893, venue: 'MHPArena', crest: 'https://crests.football-data.org/10.png' },
             { id: 9, name: 'SC Freiburg', founded: 1904, venue: 'Europa-Park Stadion', crest: 'https://crests.football-data.org/17.png' },
-            { id: 10, name: 'VfL Wolfsburg', founded: 1945, venue: 'Volkswagen Arena', crest: 'https://crests.football-data.org/11.png' }
+            { id: 10, name: 'VfL Wolfsburg', founded: 1945, venue: 'Volkswagen Arena', crest: 'https://crests.football-data.org/11.png' },
+            { id: 11, name: 'FC Augsburg', founded: 1907, venue: 'WWK Arena', crest: 'https://crests.football-data.org/16.png' },
+            { id: 12, name: 'TSG Hoffenheim', founded: 1899, venue: 'PreZero Arena', crest: 'https://crests.football-data.org/2.png' },
+            { id: 13, name: 'Werder Bremen', founded: 1899, venue: 'Wohninvest Weserstadion', crest: 'https://crests.football-data.org/12.png' },
+            { id: 14, name: 'VfL Bochum', founded: 1848, venue: 'Vonovia Ruhrstadion', crest: 'https://crests.football-data.org/36.png' },
+            { id: 15, name: 'FC Koln', founded: 1948, venue: 'RheinEnergieStadion', crest: 'https://crests.football-data.org/1.png' },
+            { id: 16, name: 'Mainz 05', founded: 1905, venue: 'MEWA Arena', crest: 'https://crests.football-data.org/15.png' },
+            { id: 17, name: 'Hertha BSC', founded: 1892, venue: 'Olympiastadion Berlin', crest: 'https://crests.football-data.org/9.png' },
+            { id: 18, name: 'FC Schalke 04', founded: 1904, venue: 'Veltins-Arena', crest: 'https://crests.football-data.org/6.png' }
           ]
         };
       } else {
@@ -271,7 +330,17 @@ class FootballAPI {
             { id: 7, name: 'Newcastle United', founded: 1892, venue: 'St. James\' Park', crest: 'https://crests.football-data.org/67.png' },
             { id: 8, name: 'Tottenham Hotspur', founded: 1882, venue: 'Tottenham Hotspur Stadium', crest: 'https://crests.football-data.org/73.png' },
             { id: 9, name: 'West Ham United', founded: 1895, venue: 'London Stadium', crest: 'https://crests.football-data.org/563.png' },
-            { id: 10, name: 'Aston Villa', founded: 1874, venue: 'Villa Park', crest: 'https://crests.football-data.org/58.png' }
+            { id: 10, name: 'Aston Villa', founded: 1874, venue: 'Villa Park', crest: 'https://crests.football-data.org/58.png' },
+            { id: 11, name: 'Crystal Palace', founded: 1905, venue: 'Selhurst Park', crest: 'https://crests.football-data.org/354.png' },
+            { id: 12, name: 'Brentford', founded: 1889, venue: 'Brentford Community Stadium', crest: 'https://crests.football-data.org/402.png' },
+            { id: 13, name: 'Fulham', founded: 1879, venue: 'Craven Cottage', crest: 'https://crests.football-data.org/63.png' },
+            { id: 14, name: 'Wolverhampton Wanderers', founded: 1877, venue: 'Molineux Stadium', crest: 'https://crests.football-data.org/76.png' },
+            { id: 15, name: 'Everton', founded: 1878, venue: 'Goodison Park', crest: 'https://crests.football-data.org/62.png' },
+            { id: 16, name: 'Nottingham Forest', founded: 1865, venue: 'The City Ground', crest: 'https://crests.football-data.org/351.png' },
+            { id: 17, name: 'AFC Bournemouth', founded: 1899, venue: 'Vitality Stadium', crest: 'https://crests.football-data.org/1044.png' },
+            { id: 18, name: 'Luton Town', founded: 1885, venue: 'Kenilworth Road', crest: 'https://crests.football-data.org/389.png' },
+            { id: 19, name: 'Burnley', founded: 1882, venue: 'Turf Moor', crest: 'https://crests.football-data.org/328.png' },
+            { id: 20, name: 'Sheffield United', founded: 1889, venue: 'Bramall Lane', crest: 'https://crests.football-data.org/356.png' }
           ]
         };
       }

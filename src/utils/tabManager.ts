@@ -26,15 +26,19 @@ class TabManager {
       switch (tabId) {
         case 'live-matches':
           console.log('Fetching live matches...');
-          data = await this.api.fetchMatches(season);
+          data = await this.api.fetchMatches();
           // Filter for live matches only
           if (data.matches) {
-            const liveMatches = data.matches.filter((match: any) => match.status === 'IN_PLAY');
+            const liveMatches = data.matches.filter((match: any) => 
+              match.status === 'IN_PLAY' || match.status === 'LIVE'
+            );
             if (liveMatches.length === 0) {
               data = { matches: [], message: 'No live matches at the moment' };
             } else {
               data = { ...data, matches: liveMatches };
             }
+          } else {
+            data = { matches: [], message: 'No live matches at the moment' };
           }
           break;
         case 'league-tables':
@@ -46,8 +50,9 @@ class TabManager {
           data = await this.api.fetchTeams(competition, season);
           break;
         case 'recent-results':
-          console.log('Fetching recent results...');
-          data = await this.api.fetchMatches(season);
+          console.log('Fetching recent results for competition:', competition, 'season:', season);
+          // Use competition-specific matches endpoint for more accurate results
+          data = await this.api.fetchCompetitionMatches(competition, season);
           // Filter for finished matches only
           if (data.matches) {
             const finishedMatches = data.matches.filter((match: any) => match.status === 'FINISHED');
