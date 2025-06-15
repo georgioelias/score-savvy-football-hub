@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
@@ -20,7 +19,7 @@ const Index = () => {
           <div 
             className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-20"
             style={{
-              backgroundImage: `url('${'/lovable-uploads/b93b2393-78cb-4d7c-b0a3-45257a738ed2.png'}')`
+              backgroundImage: `url('${'/lovable-uploads/13885943-967d-40da-996c-fe771a3770ed.png'}')`
             }}
           ></div>
           
