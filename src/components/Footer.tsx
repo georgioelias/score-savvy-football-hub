@@ -22,8 +22,8 @@ const Footer = () => {
           <Link to="/analytics" className="text-gray-400 hover:text-white transition-colors">Analytics</Link>
           <Link to="/contact" className="text-gray-400 hover:text-white transition-colors">Contact</Link>
         </div>
-        <p className="text-sm text-gray-500">&copy; {new Date().getFullYear()} Footballytics. All Rights Reserved.</p>
-        <p className="text-xs text-gray-600 mt-2">Data provided by TheSportsDB API</p>
+        <p className="text-sm text-white">&copy; {new Date().getFullYear()} Footballytics. All Rights Reserved.</p>
+        <p className="text-xs text-white mt-2">Data provided by TheSportsDB API</p>
       </div>
     </footer>
   );
