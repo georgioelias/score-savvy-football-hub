@@ -6,13 +6,12 @@ const Footer = () => {
   return (
     <footer className="bg-gray-900 text-white py-12">
       <div className="container mx-auto px-4 text-center">
-        <div className="flex items-center justify-center space-x-3 mb-4">
+        <div className="flex items-center justify-center mb-4">
           <img 
-            src="/lovable-uploads/13885943-967d-40da-996c-fe771a3770ed.png" 
+            src="/lovable-uploads/b93b2393-78cb-4d7c-b0a3-45257a738ed2.png" 
             alt="Footballytics Logo" 
-            className="w-8 h-8"
+            className="h-10"
           />
-          <h4 className="text-lg font-bold">footballytics</h4>
         </div>
         <p className="text-gray-400 mb-6 max-w-lg mx-auto">
           Your go-to platform for real-time football data and statistics from Europe's top leagues.

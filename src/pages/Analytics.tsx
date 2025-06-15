@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -103,8 +104,12 @@ const Analytics = () => {
           position: team.position
         }));
 
-        // Use real top scorers data
-        const topScorers = topScorersData.slice(0, 6);
+        // Use real top scorers data with proper mapping
+        const topScorers = topScorersData.slice(0, 6).map((scorer: any) => ({
+          name: scorer.player?.name || scorer.name || 'Unknown',
+          goals: scorer.goals || scorer.numberOfGoals || 0,
+          team: scorer.team?.name || scorer.teamName || 'Unknown Team'
+        }));
 
         // Form analysis
         const formAnalysis = teamStats

@@ -13,11 +13,10 @@ const Header = () => {
         <nav className="flex items-center justify-between">
           <Link to="/" className="flex items-center space-x-3">
             <img 
-              src="/lovable-uploads/13885943-967d-40da-996c-fe771a3770ed.png" 
+              src="/lovable-uploads/b93b2393-78cb-4d7c-b0a3-45257a738ed2.png" 
               alt="Footballytics Logo" 
-              className="w-10 h-10"
+              className="h-12"
             />
-            <h1 className="text-2xl font-bold text-gray-900">footballytics</h1>
           </Link>
           <div className="hidden md:flex items-center space-x-6">
             <Link 
