@@ -148,7 +148,7 @@ const LiveData = () => {
           <nav className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <Trophy className="h-8 w-8 text-green-600" />
-              <h1 className="text-2xl font-bold text-gray-900">Football Analytics</h1>
+              <h1 className="text-2xl font-bold text-gray-900">Footballytics</h1>
             </div>
             <div className="hidden md:flex space-x-6">
               <Link to="/" className="text-gray-600 hover:text-green-600 transition-colors">Home</Link>

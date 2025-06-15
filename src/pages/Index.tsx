@@ -15,7 +15,7 @@ const Index = () => {
           <nav className="flex items-center justify-between">
             <Link to="/" className="flex items-center space-x-2">
               <Trophy className="h-8 w-8 text-green-600" />
-              <h1 className="text-2xl font-bold text-gray-900">Football Analytics</h1>
+              <h1 className="text-2xl font-bold text-gray-900">Footballytics</h1>
             </Link>
             <div className="hidden md:flex items-center space-x-6">
               <Link to="/" className="text-green-600 font-medium">Home</Link>
@@ -27,26 +27,36 @@ const Index = () => {
       </header>
 
       <main>
-        {/* Hero Section */}
-        <section className="relative py-20 md:py-32 bg-white overflow-hidden">
-           <div className="absolute top-0 left-0 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-green-100 rounded-full opacity-50 blur-3xl"></div>
-           <div className="absolute bottom-0 right-0 translate-x-1/2 translate-y-1/2 w-96 h-96 bg-blue-100 rounded-full opacity-50 blur-3xl"></div>
+        {/* Hero Section with Background */}
+        <section className="relative py-20 md:py-32 bg-gradient-to-br from-green-600 via-green-500 to-blue-600 overflow-hidden">
+          {/* Background Image */}
+          <div 
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-20"
+            style={{
+              backgroundImage: `url('${'/lovable-uploads/13885943-967d-40da-996c-fe771a3770ed.png'}')`
+            }}
+          ></div>
+          
+          {/* Animated Background Elements */}
+          <div className="absolute top-0 left-0 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-white rounded-full opacity-10 blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-0 right-0 translate-x-1/2 translate-y-1/2 w-96 h-96 bg-yellow-300 rounded-full opacity-15 blur-3xl animate-pulse"></div>
+          
           <div className="container mx-auto px-4 text-center relative z-10">
-            <h2 className="text-4xl md:text-6xl font-extrabold text-gray-900 mb-6 leading-tight">
+            <h2 className="text-4xl md:text-6xl font-extrabold text-white mb-6 leading-tight">
               The Ultimate Football Data & Analytics Platform
             </h2>
-            <p className="text-lg md:text-xl text-gray-600 mb-10 max-w-3xl mx-auto">
+            <p className="text-lg md:text-xl text-green-100 mb-10 max-w-3xl mx-auto">
               Dive deep into real-time stats, comprehensive match data, and league standings from the world's top competitions. Your winning strategy starts here.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/live">
-                <Button size="lg" className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto shadow-lg hover:shadow-xl transition-shadow transform hover:-translate-y-0.5">
+                <Button size="lg" className="bg-white hover:bg-gray-100 text-green-600 w-full sm:w-auto shadow-xl hover:shadow-2xl transition-all transform hover:-translate-y-1">
                   <RadioTower className="mr-2 h-5 w-5" />
                   View Live Data
                 </Button>
               </Link>
               <Link to="/analytics">
-                <Button variant="outline" size="lg" className="border-gray-300 bg-white hover:bg-gray-100 w-full sm:w-auto shadow-lg hover:shadow-xl transition-shadow transform hover:-translate-y-0.5">
+                <Button variant="outline" size="lg" className="border-white bg-transparent hover:bg-white/10 text-white hover:text-white w-full sm:w-auto shadow-xl hover:shadow-2xl transition-all transform hover:-translate-y-1">
                   Explore Analytics
                 </Button>
               </Link>
@@ -135,7 +145,7 @@ const Index = () => {
         <div className="container mx-auto px-4 text-center">
           <div className="flex items-center justify-center space-x-2 mb-4">
             <Trophy className="h-6 w-6 text-green-400" />
-            <h4 className="text-lg font-bold">Football Analytics</h4>
+            <h4 className="text-lg font-bold">Footballytics</h4>
           </div>
           <p className="text-gray-400 mb-6 max-w-lg mx-auto">
             Your go-to platform for real-time football data and statistics from Europe's top leagues.
@@ -145,8 +155,8 @@ const Index = () => {
               <Link to="/live" className="text-gray-400 hover:text-white transition-colors">Live Data</Link>
               <Link to="/analytics" className="text-gray-400 hover:text-white transition-colors">Analytics</Link>
           </div>
-          <p className="text-sm text-gray-500">&copy; {new Date().getFullYear()} Football Analytics. All Rights Reserved.</p>
-          <p className="text-xs text-gray-600 mt-2">Data provided by Football-Data.org API</p>
+          <p className="text-sm text-gray-500">&copy; {new Date().getFullYear()} Footballytics. All Rights Reserved.</p>
+          <p className="text-xs text-gray-600 mt-2">Data provided by TheSportsDB API</p>
         </div>
       </footer>
     </div>
@@ -154,4 +164,3 @@ const Index = () => {
 };
 
 export default Index;
-
