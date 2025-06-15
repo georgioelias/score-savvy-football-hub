@@ -66,10 +66,10 @@ class TabManager {
       console.log('Tab data loaded successfully');
       this.setTabData(data);
       
-      // Show demo data notification if using mock data
+      // Show success notification
       toast({
-        title: "Demo Data Loaded",
-        description: "Using sample football data for demonstration. Live API data is currently unavailable due to CORS restrictions.",
+        title: "Data Loaded Successfully",
+        description: `${this.getTabDisplayName(tabId)} loaded from TheSportsDB API.`,
       });
       
     } catch (error) {
@@ -77,15 +77,15 @@ class TabManager {
       
       // Show error toast
       toast({
-        title: "Unable to load football data", 
-        description: "Using demo data instead. Live API is currently unavailable.",
+        title: "Unable to load sports data", 
+        description: "There was an issue loading data from the sports API. Please try again.",
         variant: "destructive",
       });
       
-      // This shouldn't happen now since we have fallback mock data
       this.setTabData({ 
         error: true,
-        errorMessage: 'Failed to load data',
+        errorMessage: 'Failed to load data from TheSportsDB API',
+        userFriendlyMessage: 'Unable to connect to sports data service. This may be due to API access restrictions or network issues.',
         matches: [],
         teams: [],
         standings: []
