@@ -99,7 +99,7 @@ class TabManager {
     switch (tabId) {
       case 'live-matches': return 'Live matches';
       case 'league-tables': return 'League standings';
-      case 'team-stats': return 'Team statistics';
+      case 'team-stats': return 'Team information';
       case 'recent-results': return 'Recent results';
       default: return 'Data';
     }
