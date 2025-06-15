@@ -13,7 +13,7 @@ const Header = () => {
         <nav className="flex items-center justify-between">
           <Link to="/" className="flex items-center space-x-3">
             <img 
-              src="/lovable-uploads/b93b2393-78cb-4d7c-b0a3-45257a738ed2.png" 
+              src="/lovable-uploads/fbed4e9d-e039-44bf-82db-568f80b08761.png" 
               alt="Footballytics Logo" 
               className="h-36"
             />
