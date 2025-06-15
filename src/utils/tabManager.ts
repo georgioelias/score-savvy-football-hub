@@ -1,5 +1,6 @@
 
 import FootballAPI from './footballApi';
+import { toast } from '@/hooks/use-toast';
 
 class TabManager {
   public activeTab: string;
@@ -63,8 +64,22 @@ class TabManager {
       }
       console.log('Tab data loaded successfully');
       this.setTabData(data);
+      
+      // Show success toast
+      toast({
+        title: "Data loaded successfully",
+        description: `${this.getTabDisplayName(tabId)} data has been updated.`,
+      });
+      
     } catch (error) {
       console.error('Error switching tab:', error);
+      
+      // Show error toast
+      toast({
+        title: "Unable to load football data",
+        description: "The football API is currently unavailable due to access restrictions. This is a common issue with external APIs in browser environments.",
+        variant: "destructive",
+      });
       
       // Provide user-friendly error data
       const errorMessage = error instanceof Error ? error.message : 'Failed to load data';
@@ -78,6 +93,16 @@ class TabManager {
       });
     } finally {
       this.setLoading(false);
+    }
+  }
+
+  private getTabDisplayName(tabId: string): string {
+    switch (tabId) {
+      case 'live-matches': return 'Live matches';
+      case 'league-tables': return 'League standings';
+      case 'team-stats': return 'Team statistics';
+      case 'recent-results': return 'Recent results';
+      default: return 'Data';
     }
   }
 }

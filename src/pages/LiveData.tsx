@@ -1,10 +1,11 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Link } from 'react-router-dom';
-import { Trophy, RefreshCw, Clock, Users, Calendar } from 'lucide-react';
+import { Trophy, RefreshCw, Clock, Users, Calendar, AlertCircle, Wifi, WifiOff } from 'lucide-react';
 import TabManager from '../utils/tabManager';
 
 const LiveData = () => {
@@ -55,6 +56,36 @@ const LiveData = () => {
         <div className="flex items-center justify-center py-12">
           <RefreshCw className="h-8 w-8 animate-spin text-green-600" />
           <span className="ml-2 text-gray-600">Loading data...</span>
+        </div>
+      );
+    }
+
+    // Show error state if there's an error
+    if (tabData.error) {
+      return (
+        <div className="text-center py-12 space-y-4">
+          <div className="flex justify-center">
+            <div className="bg-red-50 rounded-full p-4">
+              <WifiOff className="h-12 w-12 text-red-500" />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <h3 className="text-lg font-semibold text-gray-900">Connection Issue</h3>
+            <p className="text-gray-600 max-w-md mx-auto">
+              {tabData.userFriendlyMessage || 'Unable to load football data at the moment.'}
+            </p>
+            <p className="text-sm text-gray-500">
+              This is typically due to API access restrictions in browser environments.
+            </p>
+          </div>
+          <Button 
+            onClick={() => tabManager.switchTab(activeTab, selectedCompetition, selectedSeason)}
+            variant="outline"
+            className="mt-4"
+          >
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Try Again
+          </Button>
         </div>
       );
     }
@@ -144,6 +175,15 @@ const LiveData = () => {
     const standings = tabData.standings?.[0]?.table || [];
     console.log('Rendering standings:', standings);
     
+    if (standings.length === 0) {
+      return (
+        <div className="text-center py-12">
+          <Trophy className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+          <p className="text-gray-500 text-lg">No standings data available</p>
+        </div>
+      );
+    }
+    
     return (
       <div className="overflow-x-auto">
         <table className="w-full">
@@ -193,6 +233,15 @@ const LiveData = () => {
     const teams = tabData.teams || [];
     console.log('Rendering teams:', teams);
     
+    if (teams.length === 0) {
+      return (
+        <div className="text-center py-12">
+          <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+          <p className="text-gray-500 text-lg">No team data available</p>
+        </div>
+      );
+    }
+    
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {teams.map((team: any) => (
@@ -224,7 +273,10 @@ const LiveData = () => {
     return (
       <div className="space-y-4">
         {matches.length === 0 ? (
-          <p className="text-center text-gray-500 py-8">No recent results available</p>
+          <div className="text-center py-12">
+            <RefreshCw className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <p className="text-gray-500 text-lg">No recent results available</p>
+          </div>
         ) : (
           matches.slice(0, 10).map((match: any) => (
             <Card key={match.id} className="hover:shadow-md transition-shadow">
