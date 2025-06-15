@@ -429,6 +429,13 @@ class FootballAPI {
     return data.timeline ? data : { timeline: [] };
   }
 
+  async fetchHighlights(date: string): Promise<any[]> {
+    // date should be YYYY-MM-DD
+    const endpoint = `/eventshighlights.php?d=${date}`;
+    const data = await this.fetchData(endpoint);
+    return data.events ? data.events : [];
+  }
+
   async fetchAnalyticsData(competition = 'PL', season?: string): Promise<any> {
     try {
       // Fetch both standings and recent matches for analytics
@@ -488,10 +495,10 @@ class FootballAPI {
     const endpoint = `/search_all_seasons.php?id=${leagueId}`;
     const data = await this.fetchData(endpoint);
     if (data && data.seasons) {
-      return data.seasons.map((s: any) => s.strSeason).reverse();
+      return data.seasons.map((s: any) => s.strSeason).reverse().slice(0, 3);
     }
     // Fallback seasons if API fails. Reverse to show most recent first.
-    return ['2024-2025', '2023-2024', '2022-2023', '2021-2022'];
+    return ['2024-2025', '2023-2024', '2022-2023'];
   }
 }
 

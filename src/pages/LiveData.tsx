@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Link } from 'react-router-dom';
 import { Trophy, RefreshCw, Clock, Users, Calendar } from 'lucide-react';
 import TabManager from '../utils/tabManager';
+import FootballAPI from '../utils/footballApi';
 
 // Import new components
 import LoadingSkeleton from './live-data-components/LoadingSkeleton';
@@ -21,11 +22,13 @@ const LiveData = () => {
   const [tabData, setTabData] = useState<any>({});
   const [loading, setLoading] = useState(true);
   const [selectedCompetition, setSelectedCompetition] = useState('PL');
-  const [selectedSeason, setSelectedSeason] = useState('2024');
+  const [selectedSeason, setSelectedSeason] = useState<string | undefined>(undefined);
+  const [seasons, setSeasons] = useState<string[]>([]);
   const [autoRefresh, setAutoRefresh] = useState(false);
   const [selectedMatchday, setSelectedMatchday] = useState<string>('all');
 
   const tabManager = useMemo(() => new TabManager(activeTab, setActiveTab, setTabData, setLoading), []);
+  const api = useMemo(() => new FootballAPI(), []);
 
   const competitions: Record<string, string> = {
     'PL': 'Premier League',
@@ -37,24 +40,38 @@ const LiveData = () => {
     'EL': 'Europa League'
   };
 
-  const seasons: Record<string, string> = {
-    '2024': '2024/25',
-    '2023': '2023/24',
-    '2022': '2022/23',
-    '2021': '2021/22',
-    '2020': '2020/21',
-    '2019': '2019/20',
-    '2018': '2018/19'
-  };
+  useEffect(() => {
+    const loadSeasonsForLive = async () => {
+      setLoading(true);
+      try {
+        const seasonsData = await api.fetchSeasons(selectedCompetition);
+        setSeasons(seasonsData);
+        if (seasonsData.length > 0) {
+          setSelectedSeason(seasonsData[0]);
+        } else {
+          setSelectedSeason(undefined);
+          setTabData({});
+        }
+      } catch (error) {
+        console.error('Error loading seasons for live data:', error);
+        const fallbackSeasons = ['2024-2025', '2023-2024', '2022-2023'];
+        setSeasons(fallbackSeasons);
+        setSelectedSeason(fallbackSeasons[0]);
+      }
+    };
+    loadSeasonsForLive();
+  }, [selectedCompetition, api]);
 
   useEffect(() => {
     console.log('Effect triggered - switching tab:', activeTab, 'competition:', selectedCompetition, 'season:', selectedSeason);
-    tabManager.switchTab(activeTab, selectedCompetition, selectedSeason);
+    if (selectedSeason) {
+      tabManager.switchTab(activeTab, selectedCompetition, selectedSeason);
+    }
   }, [activeTab, selectedCompetition, selectedSeason, tabManager]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
-    if (autoRefresh) {
+    if (autoRefresh && selectedSeason) {
       console.log('Auto-refresh enabled');
       interval = setInterval(() => {
         console.log('Auto-refreshing data...');
@@ -80,7 +97,7 @@ const LiveData = () => {
   };
 
   const renderTabContent = () => {
-    if (loading) {
+    if (loading && !tabData.standings) {
       return <LoadingSkeleton />;
     }
 
@@ -88,13 +105,17 @@ const LiveData = () => {
       return (
         <ApiError
           message={tabData.userFriendlyMessage || 'Unable to load football data at the moment.'}
-          onRetry={() => tabManager.switchTab(activeTab, selectedCompetition, selectedSeason)}
+          onRetry={() => selectedSeason && tabManager.switchTab(activeTab, selectedCompetition, selectedSeason)}
         />
       );
     }
     
+    if (!selectedSeason) {
+        return <div className="text-center py-12 text-gray-500">Select a season to view data.</div>
+    }
+
     const competitionName = competitions[selectedCompetition];
-    const seasonName = seasons[selectedSeason];
+    const seasonName = selectedSeason;
 
     switch (activeTab) {
       case 'live-matches': {
@@ -155,16 +176,18 @@ const LiveData = () => {
               </SelectContent>
             </Select>
 
-            <Select value={selectedSeason} onValueChange={setSelectedSeason}>
-              <SelectTrigger className="w-full sm:w-[150px]">
-                <SelectValue placeholder="Select Season" />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.entries(seasons).map(([code, name]) => (
-                  <SelectItem key={code} value={code}>{name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {seasons.length > 0 && selectedSeason ? (
+              <Select value={selectedSeason} onValueChange={setSelectedSeason}>
+                <SelectTrigger className="w-full sm:w-[150px]">
+                  <SelectValue placeholder="Select Season" />
+                </SelectTrigger>
+                <SelectContent>
+                  {seasons.map((season) => (
+                    <SelectItem key={season} value={season}>{season}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            ) : <div className="w-full sm:w-[150px]"></div>}
             
             <Button
               variant={autoRefresh ? "default" : "outline"}
@@ -177,7 +200,8 @@ const LiveData = () => {
 
             <Button
               variant="outline"
-              onClick={() => tabManager.switchTab(activeTab, selectedCompetition, selectedSeason)}
+              onClick={() => selectedSeason && tabManager.switchTab(activeTab, selectedCompetition, selectedSeason)}
+              disabled={!selectedSeason || loading}
               className="flex items-center space-x-2"
             >
               <RefreshCw className="h-4 w-4" />

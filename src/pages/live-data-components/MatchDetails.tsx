@@ -8,6 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import LineupView from './LineupView';
 import StatsView from './StatsView';
 import TimelineView from './TimelineView';
+import HighlightsView from './HighlightsView';
 
 const api = new FootballAPI();
 
@@ -16,18 +17,27 @@ const MatchDetails = ({ match }: { match: Match }) => {
     lineup: LineupPlayer[];
     stats: EventStat[];
     timeline: TimelineEvent[];
+    highlights: any[];
   }>({
     queryKey: ['matchDetails', match.id],
     queryFn: async () => {
-      const [lineupData, statsData, timelineData] = await Promise.all([
+      const matchDate = match.utcDate.split('T')[0];
+      const [lineupData, statsData, timelineData, highlightsData] = await Promise.all([
         api.fetchLineup(match.id),
         api.fetchEventStats(match.id),
         api.fetchTimeline(match.id),
+        api.fetchHighlights(matchDate),
       ]);
+
+      const filteredHighlights = (highlightsData || []).filter(
+        (h: any) => h.strEvent?.includes(match.homeTeam.name) && h.strEvent?.includes(match.awayTeam.name)
+      );
+
       return {
         lineup: lineupData.lineup || [],
         stats: statsData.eventstats || [],
         timeline: timelineData.timeline || [],
+        highlights: filteredHighlights,
       };
     },
     enabled: !!match.id,
@@ -50,10 +60,11 @@ const MatchDetails = ({ match }: { match: Match }) => {
   return (
     <div className="bg-white p-4 rounded-b-lg border-t">
       <Tabs defaultValue="stats">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="stats">Statistics</TabsTrigger>
           <TabsTrigger value="lineups">Lineups</TabsTrigger>
           <TabsTrigger value="timeline">Timeline</TabsTrigger>
+          <TabsTrigger value="highlights">Highlights</TabsTrigger>
         </TabsList>
         <TabsContent value="stats">
           <StatsView stats={details.stats} />
@@ -63,6 +74,9 @@ const MatchDetails = ({ match }: { match: Match }) => {
         </TabsContent>
         <TabsContent value="timeline">
           <TimelineView timeline={details.timeline} homeTeamName={match.homeTeam.name} awayTeamName={match.awayTeam.name} />
+        </TabsContent>
+        <TabsContent value="highlights">
+          <HighlightsView highlights={details.highlights} />
         </TabsContent>
       </Tabs>
     </div>
