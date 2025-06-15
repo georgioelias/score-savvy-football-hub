@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 
@@ -6,24 +7,11 @@ const Footer = () => {
     <footer className="bg-gray-900 text-white py-12">
       <div className="container mx-auto px-4 text-center">
         <div className="flex items-center justify-center space-x-3 mb-4">
-          <div className="relative w-8 h-8">
-            {/* Hexagon shape with green background */}
-            <div className="w-8 h-8 bg-green-400 transform rotate-45" style={{
-              clipPath: 'polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%)'
-            }}>
-              {/* Football icon inside */}
-              <div className="absolute inset-0 flex items-center justify-center transform -rotate-45">
-                <div className="w-4 h-4 bg-white rounded-full relative">
-                  <div className="absolute top-0.5 left-0.5 w-0.5 h-0.5 bg-green-400 rounded-full"></div>
-                  <div className="absolute top-1 right-0.5 w-0.5 h-0.5 bg-green-400 rounded-full"></div>
-                  <div className="absolute bottom-0.5 left-1 w-0.5 h-0.5 bg-green-400 rounded-full"></div>
-                  {/* Curved lines to simulate football pattern */}
-                  <div className="absolute top-0 left-0 w-full h-1/2 border-b border-green-400"></div>
-                  <div className="absolute top-1/2 left-0 w-full h-1/2 border-t border-green-400"></div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <img 
+            src="/lovable-uploads/13885943-967d-40da-996c-fe771a3770ed.png" 
+            alt="Footballytics Logo" 
+            className="w-8 h-8"
+          />
           <h4 className="text-lg font-bold">footballytics</h4>
         </div>
         <p className="text-gray-400 mb-6 max-w-lg mx-auto">

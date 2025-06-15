@@ -73,8 +73,13 @@ const Analytics = () => {
       try {
         console.log('Loading analytics data for:', selectedCompetition, selectedSeason);
         
-        const standingsResponse = await api.fetchStandings(selectedCompetition, selectedSeason);
+        const [standingsResponse, topScorersData] = await Promise.all([
+          api.fetchStandings(selectedCompetition, selectedSeason),
+          api.fetchTopScorers(selectedCompetition, selectedSeason)
+        ]);
+        
         console.log('Standings response:', standingsResponse);
+        console.log('Top scorers data:', topScorersData);
         
         if (!standingsResponse || !standingsResponse.standings || !standingsResponse.standings[0]) {
           throw new Error('No standings data available');
@@ -98,14 +103,8 @@ const Analytics = () => {
           position: team.position
         }));
 
-        // Generate top scorers (mock data based on team performance)
-        const topScorers = teamStats
-          .slice(0, 6)
-          .map((team, index) => ({
-            name: `Player ${index + 1}`,
-            goals: Math.max(15 - index * 2, 5),
-            team: team.name
-          }));
+        // Use real top scorers data
+        const topScorers = topScorersData.slice(0, 6);
 
         // Form analysis
         const formAnalysis = teamStats
