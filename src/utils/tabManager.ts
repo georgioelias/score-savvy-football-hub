@@ -47,7 +47,7 @@ class TabManager {
           data = await this.api.fetchStandings(competition, season);
           break;
         case 'team-stats':
-          console.log('Fetching team stats for:', competition, 'season:', season);
+          console.log('Fetching teams info for:', competition, 'season:', season);
           data = await this.api.fetchTeams(competition, season);
           break;
         case 'recent-results':
@@ -99,7 +99,7 @@ class TabManager {
     switch (tabId) {
       case 'live-matches': return 'Live matches';
       case 'league-tables': return 'League standings';
-      case 'team-stats': return 'Team information';
+      case 'team-stats': return 'Teams information';
       case 'recent-results': return 'Recent results';
       default: return 'Data';
     }

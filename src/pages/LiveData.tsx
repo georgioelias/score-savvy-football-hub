@@ -199,7 +199,7 @@ const LiveData = () => {
                 { id: 'league-tables', label: 'League Tables', icon: Trophy },
                 { id: 'recent-results', label: 'Recent Results', icon: Calendar },
                 { id: 'live-matches', label: 'Live Matches', icon: Clock },
-                { id: 'team-stats', label: 'Team Info', icon: Users },
+                { id: 'team-stats', label: 'Teams Info', icon: Users },
               ].map((tab) => (
                 <button
                   key={tab.id}
