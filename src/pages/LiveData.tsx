@@ -35,9 +35,7 @@ const LiveData = () => {
     'PD': 'La Liga',
     'SA': 'Serie A',
     'BL1': 'Bundesliga',
-    'FL1': 'Ligue 1',
-    'CL': 'Champions League',
-    'EL': 'Europa League'
+    'FL1': 'Ligue 1'
   };
 
   useEffect(() => {
@@ -139,8 +137,9 @@ const LiveData = () => {
     }
   };
 
-  const showMatchdayFilter = activeTab === 'recent-results' || activeTab === 'live-matches';
   const availableMatchdays = useMemo(() => getAvailableMatchdays(), [tabData.matches]);
+  const hasMultipleMatchdays = availableMatchdays.length > 1;
+  const showMatchdayFilter = (activeTab === 'recent-results' || activeTab === 'live-matches') && hasMultipleMatchdays;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -235,7 +234,7 @@ const LiveData = () => {
         </div>
 
         <div className="bg-white rounded-lg shadow p-4 sm:p-6">
-          {showMatchdayFilter && availableMatchdays.length > 0 && (
+          {showMatchdayFilter && (
             <div className="flex items-center space-x-4 mb-6">
               <span className="text-sm font-medium text-gray-700">Filter by Matchday:</span>
               <Select value={selectedMatchday} onValueChange={setSelectedMatchday}>

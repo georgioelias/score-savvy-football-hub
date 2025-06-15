@@ -23,9 +23,7 @@ const Analytics = () => {
     'PD': 'La Liga', 
     'SA': 'Serie A',
     'BL1': 'Bundesliga',
-    'FL1': 'Ligue 1',
-    'CL': 'Champions League',
-    'EL': 'Europa League'
+    'FL1': 'Ligue 1'
   };
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
@@ -92,6 +90,84 @@ const Analytics = () => {
     }
   };
 
+  const getAllTeamsAcrossSeasons = () => {
+    if (!allSeasonsData.data || !allSeasonsData.seasons) return [];
+    
+    const teamStats: { [key: string]: any } = {};
+    
+    allSeasonsData.data.forEach((seasonData: any, index: number) => {
+      const season = allSeasonsData.seasons[index];
+      const teams = seasonData.topTeams || [];
+      
+      teams.forEach((team: any) => {
+        const teamName = team.team.name;
+        if (!teamStats[teamName]) {
+          teamStats[teamName] = {
+            name: teamName,
+            seasons: [],
+            totalPoints: 0,
+            totalGoals: 0,
+            totalWins: 0,
+            avgPosition: 0,
+            bestPosition: Number.MAX_SAFE_INTEGER,
+            seasonsPlayed: 0
+          };
+        }
+        
+        teamStats[teamName].seasons.push({
+          season,
+          position: team.position,
+          points: team.points,
+          goals: team.goalsFor,
+          wins: team.won
+        });
+        
+        teamStats[teamName].totalPoints += team.points;
+        teamStats[teamName].totalGoals += team.goalsFor;
+        teamStats[teamName].totalWins += team.won;
+        teamStats[teamName].bestPosition = Math.min(teamStats[teamName].bestPosition, team.position);
+        teamStats[teamName].seasonsPlayed += 1;
+      });
+    });
+
+    // Calculate averages
+    Object.values(teamStats).forEach((team: any) => {
+      team.avgPosition = Math.round(team.seasons.reduce((sum: number, s: any) => sum + s.position, 0) / team.seasonsPlayed);
+      team.avgPoints = Math.round(team.totalPoints / team.seasonsPlayed);
+      team.avgGoals = Math.round(team.totalGoals / team.seasonsPlayed);
+    });
+
+    return Object.values(teamStats).sort((a: any, b: any) => a.avgPosition - b.avgPosition);
+  };
+
+  const getDataInsightsTrends = () => {
+    if (!allSeasonsData.data || !allSeasonsData.seasons) return [];
+    
+    return allSeasonsData.seasons.map((season: string, index: number) => {
+      const seasonData = allSeasonsData.data[index];
+      const teams = seasonData.topTeams || [];
+      
+      // Safe calculation with proper type checking
+      const totalTeams = teams.length;
+      const competitiveness = totalTeams > 0 ? teams.reduce((sum: number, team: any) => {
+        const points = typeof team.points === 'number' ? team.points : 0;
+        return sum + points;
+      }, 0) / totalTeams : 0;
+      
+      const topTeamPoints = teams.length > 0 && typeof teams[0]?.points === 'number' ? teams[0].points : 0;
+      const lastTeamPoints = teams.length > 0 && typeof teams[teams.length - 1]?.points === 'number' ? teams[teams.length - 1].points : 0;
+      const pointsGap = topTeamPoints - lastTeamPoints;
+      
+      return {
+        season: season.replace('-', '/'),
+        competitiveness: Math.round(competitiveness),
+        pointsGap,
+        totalTeams,
+        avgGoalsPerTeam: seasonData.avgGoalsPerMatch * (totalTeams * 2) || 0
+      };
+    }).reverse();
+  };
+
   const getTeamComparisonData = () => {
     const team1Data = analyticsData.topTeams?.find((t: any) => t.team.name === selectedTeam1);
     const team2Data = analyticsData.topTeams?.find((t: any) => t.team.name === selectedTeam2);
@@ -107,24 +183,6 @@ const Analytics = () => {
       { stat: 'Goals Against', team1: team1Data.goalsAgainst, team2: team2Data.goalsAgainst },
       { stat: 'Goal Diff', team1: team1Data.goalDifference, team2: team2Data.goalDifference }
     ];
-  };
-
-  const getPerformanceTrends = () => {
-    if (!allSeasonsData.data || !allSeasonsData.seasons) return [];
-    
-    return allSeasonsData.seasons.map((season: string, index: number) => {
-      const seasonData = allSeasonsData.data[index];
-      const topTeam = seasonData.topTeams?.[0];
-      const avgPoints = seasonData.topTeams?.reduce((sum: number, team: any) => sum + (team.points || 0), 0) / (seasonData.topTeams?.length || 1);
-      
-      return {
-        season: season.replace('-', '/'),
-        topPoints: topTeam?.points || 0,
-        avgPoints: Math.round(avgPoints || 0),
-        totalGoals: seasonData.totalGoals || 0,
-        avgGoalsPerMatch: seasonData.avgGoalsPerMatch || 0
-      };
-    }).reverse();
   };
 
   const getDefensiveStats = () => {
@@ -149,16 +207,15 @@ const Analytics = () => {
 
   const getRecentMatches = () => {
     const matches = analyticsData.recentMatches || [];
-    // Get unique matchdays
     const matchdays = [...new Set(matches.map((m: any) => m.matchday))].filter(Boolean);
     
-    // If only one matchday, show all matches without filter
+    // Show all matches without filter if only one matchday or fewer
     if (matchdays.length <= 1) {
       return matches.slice(0, 10);
     }
     
     // Otherwise show matches from the latest matchday
-    const latestMatchday = Math.max(...matchdays);
+    const latestMatchday = Math.max(...matchdays.map(md => Number(md)).filter(md => !isNaN(md)));
     return matches.filter((m: any) => m.matchday === latestMatchday).slice(0, 10);
   };
 
@@ -173,12 +230,14 @@ const Analytics = () => {
     );
   }
 
-  const performanceTrends = getPerformanceTrends();
+  const allTeamsData = getAllTeamsAcrossSeasons();
+  const dataInsightsTrends = getDataInsightsTrends();
   const defensiveStats = getDefensiveStats();
   const winRateData = getWinRateData();
   const recentMatches = getRecentMatches();
   const comparisonData = getTeamComparisonData();
   const availableTeams = analyticsData.topTeams?.map((t: any) => t.team.name) || [];
+  const hasMultipleMatchdays = [...new Set(analyticsData.recentMatches?.map((m: any) => m.matchday))].filter(Boolean).length > 1;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -228,27 +287,73 @@ const Analytics = () => {
           </div>
         </div>
 
-        {/* Performance Trends Across Seasons */}
-        {performanceTrends.length > 0 && (
+        {/* Data Insights Trends */}
+        {dataInsightsTrends.length > 0 && (
           <div className="mb-8">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
                   <Activity className="h-5 w-5 text-purple-600" />
-                  <span>Performance Trends - {competitions[selectedCompetition]}</span>
+                  <span>League Insights - {competitions[selectedCompetition]}</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={performanceTrends}>
+                  <LineChart data={dataInsightsTrends}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="season" />
                     <YAxis />
                     <Tooltip />
-                    <Line type="monotone" dataKey="topPoints" stroke="#8b5cf6" strokeWidth={2} name="Winner Points" />
-                    <Line type="monotone" dataKey="avgPoints" stroke="#06b6d4" strokeWidth={2} name="Avg Points" />
+                    <Line type="monotone" dataKey="competitiveness" stroke="#8b5cf6" strokeWidth={2} name="Avg Points" />
+                    <Line type="monotone" dataKey="pointsGap" stroke="#06b6d4" strokeWidth={2} name="Points Gap" />
                   </LineChart>
                 </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Team Statistics Across All Seasons */}
+        {allTeamsData.length > 0 && (
+          <div className="mb-8">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Users className="h-5 w-5 text-blue-600" />
+                  <span>Team Statistics Across All Seasons</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {allTeamsData.slice(0, 12).map((team: any) => (
+                    <Card key={team.name} className="p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="font-semibold text-sm">{team.name}</h4>
+                        <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                          {team.seasonsPlayed} seasons
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div>
+                          <p className="text-gray-600">Best Position</p>
+                          <p className="font-bold text-green-600">#{team.bestPosition}</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-600">Avg Position</p>
+                          <p className="font-bold">#{team.avgPosition}</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-600">Avg Points</p>
+                          <p className="font-bold">{team.avgPoints}</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-600">Avg Goals</p>
+                          <p className="font-bold">{team.avgGoals}</p>
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -339,7 +444,7 @@ const Analytics = () => {
           </Card>
         </div>
 
-        {/* Recent Results */}
+        {/* Recent Results - No filter if only one matchday */}
         {recentMatches.length > 0 && (
           <div className="mb-8">
             <Card>
