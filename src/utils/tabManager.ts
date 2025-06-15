@@ -16,8 +16,8 @@ class TabManager {
     this.api = new FootballAPI();
   }
 
-  async switchTab(tabId: string, competition = 'PL'): Promise<void> {
-    console.log('Switching to tab:', tabId, 'Competition:', competition);
+  async switchTab(tabId: string, competition = 'PL', season?: string): Promise<void> {
+    console.log('Switching to tab:', tabId, 'Competition:', competition, 'Season:', season);
     this.setActiveTab(tabId);
     this.setLoading(true);
     
@@ -26,19 +26,33 @@ class TabManager {
       switch (tabId) {
         case 'live-matches':
           console.log('Fetching live matches...');
-          data = await this.api.fetchMatches();
+          data = await this.api.fetchMatches(season);
+          // Filter for live matches only
+          if (data.matches) {
+            const liveMatches = data.matches.filter((match: any) => match.status === 'IN_PLAY');
+            if (liveMatches.length === 0) {
+              data = { matches: [], message: 'No live matches at the moment' };
+            } else {
+              data = { ...data, matches: liveMatches };
+            }
+          }
           break;
         case 'league-tables':
-          console.log('Fetching league standings for:', competition);
-          data = await this.api.fetchStandings(competition);
+          console.log('Fetching league standings for:', competition, 'season:', season);
+          data = await this.api.fetchStandings(competition, season);
           break;
         case 'team-stats':
-          console.log('Fetching team stats for:', competition);
-          data = await this.api.fetchTeams(competition);
+          console.log('Fetching team stats for:', competition, 'season:', season);
+          data = await this.api.fetchTeams(competition, season);
           break;
         case 'recent-results':
           console.log('Fetching recent results...');
-          data = await this.api.fetchMatches();
+          data = await this.api.fetchMatches(season);
+          // Filter for finished matches only
+          if (data.matches) {
+            const finishedMatches = data.matches.filter((match: any) => match.status === 'FINISHED');
+            data = { ...data, matches: finishedMatches };
+          }
           break;
         default:
           data = {};

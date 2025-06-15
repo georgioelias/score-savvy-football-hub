@@ -1,11 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Link } from 'react-router-dom';
-import { Trophy, RefreshCw, Clock, Users } from 'lucide-react';
+import { Trophy, RefreshCw, Clock, Users, Calendar } from 'lucide-react';
 import TabManager from '../utils/tabManager';
 
 const LiveData = () => {
@@ -13,6 +12,7 @@ const LiveData = () => {
   const [tabData, setTabData] = useState<any>({});
   const [loading, setLoading] = useState(true);
   const [selectedCompetition, setSelectedCompetition] = useState('PL');
+  const [selectedSeason, setSelectedSeason] = useState('2024');
   const [autoRefresh, setAutoRefresh] = useState(false);
 
   const tabManager = new TabManager(activeTab, setActiveTab, setTabData, setLoading);
@@ -24,10 +24,18 @@ const LiveData = () => {
     'BL1': 'Bundesliga'
   };
 
+  const seasons = {
+    '2024': '2024/25',
+    '2023': '2023/24',
+    '2022': '2022/23',
+    '2021': '2021/22',
+    '2020': '2020/21'
+  };
+
   useEffect(() => {
-    console.log('Effect triggered - switching tab:', activeTab, 'competition:', selectedCompetition);
-    tabManager.switchTab(activeTab, selectedCompetition);
-  }, [activeTab, selectedCompetition]);
+    console.log('Effect triggered - switching tab:', activeTab, 'competition:', selectedCompetition, 'season:', selectedSeason);
+    tabManager.switchTab(activeTab, selectedCompetition, selectedSeason);
+  }, [activeTab, selectedCompetition, selectedSeason]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -35,11 +43,11 @@ const LiveData = () => {
       console.log('Auto-refresh enabled');
       interval = setInterval(() => {
         console.log('Auto-refreshing data...');
-        tabManager.switchTab(activeTab, selectedCompetition);
-      }, 30000); // Refresh every 30 seconds
+        tabManager.switchTab(activeTab, selectedCompetition, selectedSeason);
+      }, 30000);
     }
     return () => clearInterval(interval);
-  }, [autoRefresh, activeTab, selectedCompetition]);
+  }, [autoRefresh, activeTab, selectedCompetition, selectedSeason]);
 
   const renderTabContent = () => {
     if (loading) {
@@ -69,17 +77,32 @@ const LiveData = () => {
     const matches = tabData.matches || [];
     console.log('Rendering matches:', matches);
     
+    if (tabData.message) {
+      return (
+        <div className="text-center py-12">
+          <Clock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+          <p className="text-gray-500 text-lg">{tabData.message}</p>
+        </div>
+      );
+    }
+    
     return (
       <div className="space-y-4">
         {matches.length === 0 ? (
-          <p className="text-center text-gray-500 py-8">No matches available</p>
+          <div className="text-center py-12">
+            <Clock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <p className="text-gray-500 text-lg">No live matches at the moment</p>
+          </div>
         ) : (
           matches.map((match: any) => (
             <Card key={match.id} className="hover:shadow-md transition-shadow">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
-                    <div className="text-right">
+                    <div className="text-right flex items-center space-x-2">
+                      {match.homeTeam.crest && (
+                        <img src={match.homeTeam.crest} alt={match.homeTeam.name} className="w-6 h-6" />
+                      )}
                       <p className="font-semibold">{match.homeTeam.name}</p>
                     </div>
                     <div className="text-center">
@@ -90,8 +113,11 @@ const LiveData = () => {
                         }
                       </div>
                     </div>
-                    <div className="text-left">
+                    <div className="text-left flex items-center space-x-2">
                       <p className="font-semibold">{match.awayTeam.name}</p>
+                      {match.awayTeam.crest && (
+                        <img src={match.awayTeam.crest} alt={match.awayTeam.name} className="w-6 h-6" />
+                      )}
                     </div>
                   </div>
                   <div className="text-right">
@@ -205,7 +231,10 @@ const LiveData = () => {
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
-                    <div className="text-right">
+                    <div className="text-right flex items-center space-x-2">
+                      {match.homeTeam.crest && (
+                        <img src={match.homeTeam.crest} alt={match.homeTeam.name} className="w-6 h-6" />
+                      )}
                       <p className="font-semibold">{match.homeTeam.name}</p>
                     </div>
                     <div className="text-center">
@@ -213,8 +242,11 @@ const LiveData = () => {
                         {match.score.fullTime.home} - {match.score.fullTime.away}
                       </div>
                     </div>
-                    <div className="text-left">
+                    <div className="text-left flex items-center space-x-2">
                       <p className="font-semibold">{match.awayTeam.name}</p>
+                      {match.awayTeam.crest && (
+                        <img src={match.awayTeam.crest} alt={match.awayTeam.name} className="w-6 h-6" />
+                      )}
                     </div>
                   </div>
                   <div className="text-right">
@@ -270,6 +302,17 @@ const LiveData = () => {
                 ))}
               </SelectContent>
             </Select>
+
+            <Select value={selectedSeason} onValueChange={setSelectedSeason}>
+              <SelectTrigger className="w-[150px]">
+                <SelectValue placeholder="Select Season" />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.entries(seasons).map(([code, name]) => (
+                  <SelectItem key={code} value={code}>{name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             
             <Button
               variant={autoRefresh ? "default" : "outline"}
@@ -282,7 +325,7 @@ const LiveData = () => {
 
             <Button
               variant="outline"
-              onClick={() => tabManager.switchTab(activeTab, selectedCompetition)}
+              onClick={() => tabManager.switchTab(activeTab, selectedCompetition, selectedSeason)}
               className="flex items-center space-x-2"
             >
               <RefreshCw className="h-4 w-4" />
