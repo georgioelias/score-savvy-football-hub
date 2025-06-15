@@ -1,3 +1,4 @@
+
 class FootballAPI {
   public baseURL: string;
   public apiKey: string;
@@ -85,7 +86,7 @@ class FootballAPI {
       };
     }
     
-    // Mock data for league table - only used when API completely fails
+    // Mock data for league table
     if (endpoint.includes('lookuptable') || endpoint.includes('table')) {
       return {
         table: [
@@ -160,56 +161,15 @@ class FootballAPI {
     return { message: 'Mock data not available for this endpoint' };
   }
 
-  async fetchMatches(season?: string): Promise<any> {
-    const endpoint = '/eventspastleague.php?id=4328';
-    const data = await this.fetchData(endpoint);
-    
-    if (data.events) {
-      const matches = data.events.map((event: any) => ({
-        id: event.idEvent,
-        homeTeam: {
-          id: event.idHomeTeam,
-          name: event.strHomeTeam,
-          shortName: event.strHomeTeam,
-          tla: event.strHomeTeam?.substring(0, 3).toUpperCase(),
-          crest: event.strHomeTeamBadge || `https://www.thesportsdb.com/images/media/team/badge/default.png`
-        },
-        awayTeam: {
-          id: event.idAwayTeam,
-          name: event.strAwayTeam,
-          shortName: event.strAwayTeam,
-          tla: event.strAwayTeam?.substring(0, 3).toUpperCase(),
-          crest: event.strAwayTeamBadge || `https://www.thesportsdb.com/images/media/team/badge/default.png`
-        },
-        utcDate: `${event.dateEvent}T${event.strTime || '15:00:00'}Z`,
-        status: event.strStatus === 'Match Finished' ? 'FINISHED' : event.strStatus === 'Not Started' ? 'SCHEDULED' : 'IN_PLAY',
-        score: {
-          fullTime: {
-            home: event.intHomeScore ? parseInt(event.intHomeScore) : null,
-            away: event.intAwayScore ? parseInt(event.intAwayScore) : null
-          }
-        },
-        competition: { name: "Premier League" },
-        season: event.strSeason || season || "2024-2025",
-        matchday: event.intRound ? parseInt(event.intRound) : null
-      }));
-      
-      return { matches, count: matches.length };
-    }
-    
-    return data;
-  }
-
   async fetchStandings(competition = 'PL', season?: string): Promise<any> {
     const leagueId = this.getLeagueId(competition);
     
-    // Special handling for Champions League and Europa League
+    // For Champions League and Europa League, use mock data
     if (competition === 'CL' || competition === 'EL') {
-      console.log(`Fetching ${competition} standings - using mock data as API may not have current season`);
+      console.log(`Fetching ${competition} standings - using mock data`);
       return this.getMockStandingsData(competition);
     }
     
-    // Try to get standings for specific season if provided
     let endpoint = `/lookuptable.php?l=${leagueId}`;
     if (season) {
       endpoint += `&s=${season}`;
@@ -217,10 +177,7 @@ class FootballAPI {
     
     const data = await this.fetchData(endpoint);
     
-    console.log('Raw standings data from API:', data);
-    
     if (data.table && Array.isArray(data.table)) {
-      // Use ALL data from the API, don't limit it
       const table = data.table.map((team: any, index: number) => ({
         position: parseInt(team.intRank) || (index + 1),
         team: {
@@ -241,9 +198,6 @@ class FootballAPI {
         form: team.strForm || 'N/A'
       }));
       
-      console.log('Transformed standings data:', table);
-      console.log('Total teams in standings:', table.length);
-      
       return {
         standings: [{
           stage: "REGULAR_SEASON",
@@ -258,8 +212,7 @@ class FootballAPI {
       };
     }
     
-    // Only fallback to mock data if API completely fails
-    console.log('API returned no table data, using mock data as fallback');
+    console.log('API returned no table data, using mock data');
     return this.getMockStandingsData(competition);
   }
 
@@ -303,6 +256,46 @@ class FootballAPI {
     return competitionNames[code] || 'Football League';
   }
 
+  async fetchMatches(season?: string): Promise<any> {
+    const endpoint = '/eventspastleague.php?id=4328';
+    const data = await this.fetchData(endpoint);
+    
+    if (data.events) {
+      const matches = data.events.map((event: any) => ({
+        id: event.idEvent,
+        homeTeam: {
+          id: event.idHomeTeam,
+          name: event.strHomeTeam,
+          shortName: event.strHomeTeam,
+          tla: event.strHomeTeam?.substring(0, 3).toUpperCase(),
+          crest: event.strHomeTeamBadge || `https://www.thesportsdb.com/images/media/team/badge/default.png`
+        },
+        awayTeam: {
+          id: event.idAwayTeam,
+          name: event.strAwayTeam,
+          shortName: event.strAwayTeam,
+          tla: event.strAwayTeam?.substring(0, 3).toUpperCase(),
+          crest: event.strAwayTeamBadge || `https://www.thesportsdb.com/images/media/team/badge/default.png`
+        },
+        utcDate: `${event.dateEvent}T${event.strTime || '15:00:00'}Z`,
+        status: event.strStatus === 'Match Finished' ? 'FINISHED' : event.strStatus === 'Not Started' ? 'SCHEDULED' : 'IN_PLAY',
+        score: {
+          fullTime: {
+            home: event.intHomeScore ? parseInt(event.intHomeScore) : null,
+            away: event.intAwayScore ? parseInt(event.intAwayScore) : null
+          }
+        },
+        competition: { name: "Premier League" },
+        season: event.strSeason || season || "2024-2025",
+        matchday: event.intRound ? parseInt(event.intRound) : null
+      }));
+      
+      return { matches, count: matches.length };
+    }
+    
+    return data;
+  }
+
   async fetchTeams(competition = 'PL', season?: string): Promise<any> {
     const leagueId = this.getLeagueId(competition);
     const endpoint = `/search_all_teams.php?l=${this.getLeagueName(competition)}`;
@@ -340,75 +333,44 @@ class FootballAPI {
 
   async fetchCompetitionMatches(competition = 'PL', season?: string): Promise<any> {
     const leagueId = this.getLeagueId(competition);
+    const endpoint = `/eventspastleague.php?id=${leagueId}`;
     
-    // Try multiple endpoints to get comprehensive match data
-    const endpoints = [
-      `/eventspastleague.php?id=${leagueId}`, // Past matches
-      `/eventsround.php?id=${leagueId}&r=1&s=${season || '2024-2025'}`, // Round 1
-      `/eventsround.php?id=${leagueId}&r=2&s=${season || '2024-2025'}`, // Round 2
-      `/eventsround.php?id=${leagueId}&r=3&s=${season || '2024-2025'}`, // Round 3
-      `/eventsround.php?id=${leagueId}&r=4&s=${season || '2024-2025'}`, // Round 4
-      `/eventsround.php?id=${leagueId}&r=5&s=${season || '2024-2025'}`, // Round 5
-      `/eventsround.php?id=${leagueId}&r=38&s=${season || '2024-2025'}`, // Last round
-      `/eventsnextleague.php?id=${leagueId}` // Upcoming matches
-    ];
+    const data = await this.fetchData(endpoint);
     
-    let allEvents: any[] = [];
-    
-    for (const endpoint of endpoints) {
-      try {
-        const data = await this.fetchData(endpoint);
-        if (data.events && Array.isArray(data.events)) {
-          allEvents = [...allEvents, ...data.events];
-        }
-      } catch (error) {
-        console.log('Failed to fetch from endpoint:', endpoint);
-      }
+    if (data.events && Array.isArray(data.events)) {
+      const matches = data.events.map((event: any) => ({
+        id: event.idEvent,
+        homeTeam: {
+          id: event.idHomeTeam,
+          name: event.strHomeTeam,
+          shortName: event.strHomeTeam,
+          tla: event.strHomeTeam?.substring(0, 3).toUpperCase(),
+          crest: event.strHomeTeamBadge || `https://www.thesportsdb.com/images/media/team/badge/default.png`
+        },
+        awayTeam: {
+          id: event.idAwayTeam,
+          name: event.strAwayTeam,
+          shortName: event.strAwayTeam,
+          tla: event.strAwayTeam?.substring(0, 3).toUpperCase(),
+          crest: event.strAwayTeamBadge || `https://www.thesportsdb.com/images/media/team/badge/default.png`
+        },
+        utcDate: `${event.dateEvent}T${event.strTime || '15:00:00'}Z`,
+        status: event.strStatus === 'Match Finished' ? 'FINISHED' : event.strStatus === 'Not Started' ? 'SCHEDULED' : 'IN_PLAY',
+        score: {
+          fullTime: {
+            home: event.intHomeScore ? parseInt(event.intHomeScore) : null,
+            away: event.intAwayScore ? parseInt(event.intAwayScore) : null
+          }
+        },
+        competition: { name: this.getCompetitionName(competition) },
+        season: event.strSeason || season || "2024-2025",
+        matchday: event.intRound ? parseInt(event.intRound) : null
+      }));
+      
+      return { matches, count: matches.length };
     }
     
-    // Remove duplicates based on event ID
-    const uniqueEvents = allEvents.filter((event, index, self) => 
-      index === self.findIndex(e => e.idEvent === event.idEvent)
-    );
-    
-    console.log('Total unique events found:', uniqueEvents.length);
-    
-    const matches = uniqueEvents.map((event: any) => ({
-      id: event.idEvent,
-      homeTeam: {
-        id: event.idHomeTeam,
-        name: event.strHomeTeam,
-        shortName: event.strHomeTeam,
-        tla: event.strHomeTeam?.substring(0, 3).toUpperCase(),
-        crest: event.strHomeTeamBadge || `https://www.thesportsdb.com/images/media/team/badge/default.png`
-      },
-      awayTeam: {
-        id: event.idAwayTeam,
-        name: event.strAwayTeam,
-        shortName: event.strAwayTeam,
-        tla: event.strAwayTeam?.substring(0, 3).toUpperCase(),
-        crest: event.strAwayTeamBadge || `https://www.thesportsdb.com/images/media/team/badge/default.png`
-      },
-      utcDate: `${event.dateEvent}T${event.strTime || '15:00:00'}Z`,
-      status: event.strStatus === 'Match Finished' ? 'FINISHED' : event.strStatus === 'Not Started' ? 'SCHEDULED' : 'IN_PLAY',
-      score: {
-        fullTime: {
-          home: event.intHomeScore ? parseInt(event.intHomeScore) : null,
-          away: event.intAwayScore ? parseInt(event.intAwayScore) : null
-        }
-      },
-      competition: { name: this.getCompetitionName(competition) },
-      season: event.strSeason || season || "2024-2025",
-      matchday: event.intRound ? parseInt(event.intRound) : null,
-      goalscorers: this.parseGoalscorers(event)
-    }));
-    
-    return { matches, count: matches.length };
-  }
-
-  private parseGoalscorers(event: any): any[] {
-    // TheSportsDB doesn't always have goalscorer data in the basic event endpoint
-    return [];
+    return { matches: [], count: 0 };
   }
 
   async fetchLineup(eventId: string): Promise<any> {
@@ -430,7 +392,6 @@ class FootballAPI {
   }
 
   async fetchHighlights(date: string): Promise<any[]> {
-    // date should be YYYY-MM-DD
     const endpoint = `/eventshighlights.php?d=${date}`;
     const data = await this.fetchData(endpoint);
     return data.events ? data.events : [];
@@ -438,7 +399,6 @@ class FootballAPI {
 
   async fetchAnalyticsData(competition = 'PL', season?: string): Promise<any> {
     try {
-      // Fetch both standings and recent matches for analytics
       const [standings, matches] = await Promise.all([
         this.fetchStandings(competition, season),
         this.fetchCompetitionMatches(competition, season)
@@ -447,13 +407,11 @@ class FootballAPI {
       const standingsTable = standings.standings?.[0]?.table || [];
       const recentMatches = matches.matches?.filter((m: any) => m.status === 'FINISHED').slice(0, 100) || [];
 
-      // Calculate analytics from real data (standings table for accuracy)
       const totalGoals = standingsTable.reduce((sum: number, team: any) => sum + (team.goalsFor || 0), 0);
       const totalMatchesPlayed = standingsTable.reduce((sum: number, team: any) => sum + (team.playedGames || 0), 0) / 2;
       
       const avgGoalsPerMatch = totalMatchesPlayed > 0 ? (totalGoals / totalMatchesPlayed).toFixed(1) : '0.0';
 
-      // Find top scorer from standings
       const topScoringTeamData = standingsTable.reduce((max: any, team: any) => {
         return ((team.goalsFor || 0) > (max?.goalsFor || 0)) ? team : max;
       }, null);
@@ -466,7 +424,7 @@ class FootballAPI {
         avgGoalsPerMatch: parseFloat(avgGoalsPerMatch),
         topScorerGoals: topScoringTeamData?.goalsFor || 0,
         topScoringTeam: topScoringTeamData?.team?.name || 'Unknown',
-        topTeams: standingsTable, // Return all teams for dropdowns
+        topTeams: standingsTable,
         recentMatches: recentMatches,
         leagueStats: [
           { name: 'Goals', value: totalGoals },
@@ -482,7 +440,6 @@ class FootballAPI {
         avgGoalsPerMatch: 0,
         topScorerGoals: 0,
         topScoringTeam: 'Unknown',
-        cleanSheetsRecord: 0,
         topTeams: [],
         recentMatches: [],
         leagueStats: []
@@ -491,13 +448,7 @@ class FootballAPI {
   }
 
   async fetchSeasons(competition: string): Promise<string[]> {
-    const leagueId = this.getLeagueId(competition);
-    const endpoint = `/search_all_seasons.php?id=${leagueId}`;
-    const data = await this.fetchData(endpoint);
-    if (data && data.seasons) {
-      return data.seasons.map((s: any) => s.strSeason).reverse().slice(0, 3);
-    }
-    // Fallback seasons if API fails. Reverse to show most recent first.
+    // Return consistent seasons for all competitions
     return ['2024-2025', '2023-2024', '2022-2023'];
   }
 }
