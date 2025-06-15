@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -60,7 +59,30 @@ const Analytics = () => {
     'FL1': 'Ligue 1'
   };
 
-  // Mock top scorers data when API fails
+  // Fetch top scorers from API
+  const fetchTopScorers = async (competition: string, season: string): Promise<Array<{ name: string; goals: number; team: string }>> => {
+    try {
+      console.log('Fetching top scorers for:', competition, season);
+      const response = await api.fetchTopScorers(competition, season);
+      console.log('Top scorers response:', response);
+      
+      if (response && response.scorers && response.scorers.length > 0) {
+        return response.scorers.slice(0, 8).map((scorer: any) => ({
+          name: scorer.player?.name || 'Unknown Player',
+          goals: scorer.goals || 0,
+          team: scorer.team?.name?.length > 12 ? scorer.team.name.substring(0, 12) + '...' : scorer.team?.name || 'Unknown Team'
+        }));
+      }
+      
+      throw new Error('No top scorers data available');
+    } catch (error) {
+      console.error('Error fetching top scorers:', error);
+      // Return empty array if API fails
+      return [];
+    }
+  };
+
+  // Generate mock top scorers only as fallback
   const generateMockTopScorers = (teamStats: TeamStats[]): Array<{ name: string; goals: number; team: string }> => {
     const topTeams = teamStats.slice(0, 6);
     return topTeams.map((team, index) => ({
@@ -97,11 +119,13 @@ const Analytics = () => {
       try {
         console.log('Loading analytics data for:', selectedCompetition, selectedSeason);
         
-        const [standingsResponse] = await Promise.all([
-          api.fetchStandings(selectedCompetition, selectedSeason)
+        const [standingsResponse, topScorersData] = await Promise.all([
+          api.fetchStandings(selectedCompetition, selectedSeason),
+          fetchTopScorers(selectedCompetition, selectedSeason)
         ]);
         
         console.log('Standings response:', standingsResponse);
+        console.log('Top scorers data:', topScorersData);
         
         if (!standingsResponse || !standingsResponse.standings || !standingsResponse.standings[0]) {
           throw new Error('No standings data available');
@@ -134,8 +158,8 @@ const Analytics = () => {
           };
         });
 
-        // Generate mock top scorers since API is failing
-        const topScorers = generateMockTopScorers(teamStats);
+        // Use API data if available, otherwise use mock data
+        const topScorers = topScorersData.length > 0 ? topScorersData : generateMockTopScorers(teamStats);
 
         // Enhanced form analysis
         const formAnalysis = teamStats
