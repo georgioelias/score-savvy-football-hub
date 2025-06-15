@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Trophy, Users } from 'lucide-react';
+import { Trophy } from 'lucide-react';
 import { Standing } from '@/types/football';
 
 interface StandingsTableProps {
@@ -27,10 +27,7 @@ const StandingsTable: React.FC<StandingsTableProps> = ({ standings, competitionN
   console.log('StandingsTable received competitionName:', competitionName);
   console.log('StandingsTable received seasonName:', seasonName);
   
-  // The standings should already be the correct array of Standing objects
-  const actualStandings = standings || [];
-  
-  if (!actualStandings || actualStandings.length === 0) {
+  if (!standings || standings.length === 0) {
     return (
       <div className="text-center py-12">
         <Trophy className="h-12 w-12 text-gray-400 mx-auto mb-4" />
@@ -54,7 +51,7 @@ const StandingsTable: React.FC<StandingsTableProps> = ({ standings, competitionN
           </h3>
         </div>
         <p className="text-sm text-gray-600 mt-1">
-          Complete league table with {actualStandings.length} teams
+          Complete league table with {standings.length} teams
         </p>
       </div>
 
@@ -76,7 +73,7 @@ const StandingsTable: React.FC<StandingsTableProps> = ({ standings, competitionN
             </tr>
           </thead>
           <tbody>
-            {actualStandings.map((team, index) => (
+            {standings.map((team, index) => (
               <tr key={team.team.id || index} className="border-b hover:bg-gray-50 transition-colors">
                 <td className={`p-3 font-medium ${getPositionColor(team.position, isGroupStage)}`}>{team.position}</td>
                 <td className="p-3">
