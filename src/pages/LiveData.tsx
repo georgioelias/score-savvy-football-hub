@@ -1,9 +1,8 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Link } from 'react-router-dom';
-import { Trophy, RefreshCw, Clock, Users, Calendar } from 'lucide-react';
+import { RefreshCw, Clock, Users, Calendar, Trophy } from 'lucide-react';
+import Header from '@/components/Header';
 import TabManager from '../utils/tabManager';
 import FootballAPI from '../utils/footballApi';
 
@@ -85,7 +84,7 @@ const LiveData = () => {
       .map((match: any) => match.matchday)
       .filter((md: any) => typeof md === 'number' && md !== null && md !== undefined)
     )] as number[];
-    return matchdays.sort((a: number, b: number) => a - b); // Earliest first
+    return matchdays.sort((a: number, b: number) => a - b);
   };
 
   const getFilteredMatches = (): Match[] => {
@@ -143,21 +142,7 @@ const LiveData = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm border-b">
-        <div className="container mx-auto px-4 py-4">
-          <nav className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Trophy className="h-8 w-8 text-green-600" />
-              <h1 className="text-2xl font-bold text-gray-900">Footballytics</h1>
-            </div>
-            <div className="hidden md:flex space-x-6">
-              <Link to="/" className="text-gray-600 hover:text-green-600 transition-colors">Home</Link>
-              <Link to="/live" className="text-green-600 font-medium">Live Data</Link>
-              <Link to="/analytics" className="text-gray-600 hover:text-green-600 transition-colors">Analytics</Link>
-            </div>
-          </nav>
-        </div>
-      </header>
+      <Header />
 
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
