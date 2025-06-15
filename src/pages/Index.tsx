@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { Trophy, BarChart3, RadioTower, MousePointerSquare, Database, BrainCircuit } from 'lucide-react';
+import { Trophy, BarChart3, RadioTower, MousePointer, Database, BrainCircuit } from 'lucide-react';
 import FeatureCard from './index-components/FeatureCard';
 import HowItWorksStep from './index-components/HowItWorksStep';
 
@@ -93,7 +93,7 @@ const Index = () => {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
               <HowItWorksStep
-                icon={<MousePointerSquare className="h-8 w-8 text-green-600" />}
+                icon={<MousePointer className="h-8 w-8 text-green-600" />}
                 step="Step 1"
                 title="Select Competition"
                 description="Choose from a list of major football leagues and seasons to begin your analysis."
@@ -154,3 +154,4 @@ const Index = () => {
 };
 
 export default Index;
+
