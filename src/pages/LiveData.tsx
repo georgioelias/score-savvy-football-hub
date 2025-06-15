@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Link } from 'react-router-dom';
 import { Trophy, RefreshCw, Clock, Users, Calendar, AlertCircle, Wifi, WifiOff } from 'lucide-react';
 import TabManager from '../utils/tabManager';
@@ -126,6 +127,7 @@ const LiveData = () => {
 
   const renderMatches = () => {
     const matches = tabData.matches || [];
+    const availableMatchdays = getAvailableMatchdays();
     console.log('Rendering matches:', matches);
     
     if (tabData.message) {
@@ -139,13 +141,31 @@ const LiveData = () => {
     
     return (
       <div className="space-y-4">
-        {matches.length === 0 ? (
+        {/* Matchday Filter for Live Matches */}
+        {availableMatchdays.length > 0 && (
+          <div className="flex items-center space-x-4 mb-4">
+            <span className="text-sm font-medium text-gray-700">Filter by Matchday:</span>
+            <Select value={selectedMatchday} onValueChange={setSelectedMatchday}>
+              <SelectTrigger className="w-[150px]">
+                <SelectValue placeholder="All Matchdays" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Matchdays</SelectItem>
+                {availableMatchdays.map((md: number) => (
+                  <SelectItem key={md} value={md.toString()}>Matchday {md}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+
+        {getFilteredMatches().length === 0 ? (
           <div className="text-center py-12">
             <Clock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-500 text-lg">No live matches at the moment</p>
+            <p className="text-gray-500 text-lg">No matches found for the selected criteria</p>
           </div>
         ) : (
-          matches.map((match: any) => (
+          getFilteredMatches().map((match: any) => (
             <Card key={match.id} className="hover:shadow-md transition-shadow">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
@@ -346,59 +366,68 @@ const LiveData = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {teams.map((team: any) => (
-            <Card key={team.id} className="hover:shadow-lg transition-shadow duration-200">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg flex items-center space-x-3">
-                  {team.crest && (
-                    <img 
-                      src={team.crest} 
-                      alt={team.name} 
-                      className="w-10 h-10 object-contain"
-                      onError={(e) => {
-                        e.currentTarget.src = 'https://www.thesportsdb.com/images/media/team/badge/default.png';
-                      }}
-                    />
-                  )}
-                  <div>
-                    <span className="text-gray-900">{team.name}</span>
-                    <div className="text-sm text-gray-500 font-normal">{team.tla}</div>
-                  </div>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3 text-sm">
-                  <div className="flex justify-between">
-                    <span className="font-medium text-gray-600">Founded:</span>
-                    <span className="text-gray-900">{team.founded || 'N/A'}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="font-medium text-gray-600">Stadium:</span>
-                    <span className="text-gray-900 text-right">{team.venue}</span>
-                  </div>
-                  {team.location && (
-                    <div className="flex justify-between">
-                      <span className="font-medium text-gray-600">Location:</span>
-                      <span className="text-gray-900 text-right">{team.location}</span>
-                    </div>
-                  )}
-                  {team.website && (
-                    <div className="pt-2">
+        {/* Teams Table */}
+        <div className="bg-white rounded-lg shadow overflow-hidden">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[50px]">Logo</TableHead>
+                <TableHead>Team Name</TableHead>
+                <TableHead>Short Name</TableHead>
+                <TableHead>Founded</TableHead>
+                <TableHead>Stadium</TableHead>
+                <TableHead>Location</TableHead>
+                <TableHead>Website</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {teams.map((team: any) => (
+                <TableRow key={team.id} className="hover:bg-gray-50">
+                  <TableCell>
+                    {team.crest && (
+                      <img 
+                        src={team.crest} 
+                        alt={team.name} 
+                        className="w-8 h-8 object-contain"
+                        onError={(e) => {
+                          e.currentTarget.src = 'https://www.thesportsdb.com/images/media/team/badge/default.png';
+                        }}
+                      />
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <div className="font-semibold text-gray-900">{team.name}</div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="text-sm text-gray-600">{team.tla}</div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="text-sm text-gray-600">{team.founded || 'N/A'}</div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="text-sm text-gray-600">{team.venue}</div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="text-sm text-gray-600">{team.location || 'N/A'}</div>
+                  </TableCell>
+                  <TableCell>
+                    {team.website ? (
                       <a 
                         href={`https://${team.website}`} 
                         target="_blank" 
                         rel="noopener noreferrer"
                         className="text-blue-600 hover:text-blue-800 text-xs underline"
                       >
-                        Official Website
+                        Visit
                       </a>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                    ) : (
+                      <span className="text-gray-400 text-xs">N/A</span>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
       </div>
     );
