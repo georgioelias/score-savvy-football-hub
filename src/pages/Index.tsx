@@ -5,7 +5,6 @@ import { Link } from 'react-router-dom';
 import { Circle, BarChart3, RadioTower, MousePointer, Database, BrainCircuit } from 'lucide-react';
 import FeatureCard from './index-components/FeatureCard';
 import HowItWorksStep from './index-components/HowItWorksStep';
-import ContactForm from './index-components/ContactForm';
 
 const Index = () => {
   return (
@@ -15,13 +14,20 @@ const Index = () => {
         <div className="container mx-auto px-4 py-4">
           <nav className="flex items-center justify-between">
             <Link to="/" className="flex items-center space-x-2">
-              <Circle className="h-8 w-8 text-green-600 fill-current" />
+              <div className="h-8 w-8 bg-green-600 rounded-full flex items-center justify-center">
+                <div className="h-6 w-6 bg-white rounded-full relative">
+                  <div className="absolute top-1 left-1 w-1 h-1 bg-green-600 rounded-full"></div>
+                  <div className="absolute top-2 right-1 w-1 h-1 bg-green-600 rounded-full"></div>
+                  <div className="absolute bottom-1 left-2 w-1 h-1 bg-green-600 rounded-full"></div>
+                </div>
+              </div>
               <h1 className="text-2xl font-bold text-gray-900">Footballytics</h1>
             </Link>
             <div className="hidden md:flex items-center space-x-6">
               <Link to="/" className="text-green-600 font-medium">Home</Link>
               <Link to="/live" className="text-gray-600 hover:text-green-600 transition-colors">Live Data</Link>
               <Link to="/analytics" className="text-gray-600 hover:text-green-600 transition-colors">Analytics</Link>
+              <Link to="/contact" className="text-gray-600 hover:text-green-600 transition-colors">Contact</Link>
             </div>
           </nav>
         </div>
@@ -82,7 +88,13 @@ const Index = () => {
                 description="Get real-time updates from ongoing matches and browse recent results across major European leagues."
               />
               <FeatureCard
-                icon={<Circle className="h-10 w-10 text-green-600 fill-current" />}
+                icon={<div className="h-10 w-10 bg-green-600 rounded-full flex items-center justify-center">
+                  <div className="h-8 w-8 bg-white rounded-full relative">
+                    <div className="absolute top-1 left-1 w-1 h-1 bg-green-600 rounded-full"></div>
+                    <div className="absolute top-2 right-1 w-1 h-1 bg-green-600 rounded-full"></div>
+                    <div className="absolute bottom-1 left-2 w-1 h-1 bg-green-600 rounded-full"></div>
+                  </div>
+                </div>}
                 title="In-Depth Standings"
                 description="Track your favorite team's progress with detailed league tables, including form, goal difference, and more."
               />
@@ -125,20 +137,6 @@ const Index = () => {
           </div>
         </section>
 
-        {/* Contact Section */}
-        <section className="py-20 bg-gray-50">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-16">
-              <span className="text-green-600 font-semibold tracking-wider">CONTACT</span>
-              <h3 className="text-3xl md:text-4xl font-bold text-gray-900 mt-2">Get in Touch</h3>
-              <p className="text-lg text-gray-600 mt-4 max-w-2xl mx-auto">
-                Have a question or feedback? We'd love to hear from you.
-              </p>
-            </div>
-            <ContactForm />
-          </div>
-        </section>
-
         {/* Final CTA Section */}
         <section className="bg-green-600">
           <div className="container mx-auto px-4 py-20 text-center">
@@ -159,7 +157,13 @@ const Index = () => {
       <footer className="bg-gray-900 text-white py-12">
         <div className="container mx-auto px-4 text-center">
           <div className="flex items-center justify-center space-x-2 mb-4">
-            <Circle className="h-6 w-6 text-green-400 fill-current" />
+            <div className="h-6 w-6 bg-green-400 rounded-full flex items-center justify-center">
+              <div className="h-4 w-4 bg-white rounded-full relative">
+                <div className="absolute top-0.5 left-0.5 w-0.5 h-0.5 bg-green-400 rounded-full"></div>
+                <div className="absolute top-1 right-0.5 w-0.5 h-0.5 bg-green-400 rounded-full"></div>
+                <div className="absolute bottom-0.5 left-1 w-0.5 h-0.5 bg-green-400 rounded-full"></div>
+              </div>
+            </div>
             <h4 className="text-lg font-bold">Footballytics</h4>
           </div>
           <p className="text-gray-400 mb-6 max-w-lg mx-auto">
@@ -169,6 +173,7 @@ const Index = () => {
               <Link to="/" className="text-gray-400 hover:text-white transition-colors">Home</Link>
               <Link to="/live" className="text-gray-400 hover:text-white transition-colors">Live Data</Link>
               <Link to="/analytics" className="text-gray-400 hover:text-white transition-colors">Analytics</Link>
+              <Link to="/contact" className="text-gray-400 hover:text-white transition-colors">Contact</Link>
           </div>
           <p className="text-sm text-gray-500">&copy; {new Date().getFullYear()} Footballytics. All Rights Reserved.</p>
           <p className="text-xs text-gray-600 mt-2">Data provided by TheSportsDB API</p>
