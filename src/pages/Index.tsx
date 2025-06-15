@@ -2,9 +2,10 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { Trophy, BarChart3, RadioTower, MousePointer, Database, BrainCircuit } from 'lucide-react';
+import { Circle, BarChart3, RadioTower, MousePointer, Database, BrainCircuit } from 'lucide-react';
 import FeatureCard from './index-components/FeatureCard';
 import HowItWorksStep from './index-components/HowItWorksStep';
+import ContactForm from './index-components/ContactForm';
 
 const Index = () => {
   return (
@@ -14,7 +15,7 @@ const Index = () => {
         <div className="container mx-auto px-4 py-4">
           <nav className="flex items-center justify-between">
             <Link to="/" className="flex items-center space-x-2">
-              <Trophy className="h-8 w-8 text-green-600" />
+              <Circle className="h-8 w-8 text-green-600 fill-current" />
               <h1 className="text-2xl font-bold text-gray-900">Footballytics</h1>
             </Link>
             <div className="hidden md:flex items-center space-x-6">
@@ -81,7 +82,7 @@ const Index = () => {
                 description="Get real-time updates from ongoing matches and browse recent results across major European leagues."
               />
               <FeatureCard
-                icon={<Trophy className="h-10 w-10 text-green-600" />}
+                icon={<Circle className="h-10 w-10 text-green-600 fill-current" />}
                 title="In-Depth Standings"
                 description="Track your favorite team's progress with detailed league tables, including form, goal difference, and more."
               />
@@ -124,6 +125,20 @@ const Index = () => {
           </div>
         </section>
 
+        {/* Contact Section */}
+        <section className="py-20 bg-gray-50">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-16">
+              <span className="text-green-600 font-semibold tracking-wider">CONTACT</span>
+              <h3 className="text-3xl md:text-4xl font-bold text-gray-900 mt-2">Get in Touch</h3>
+              <p className="text-lg text-gray-600 mt-4 max-w-2xl mx-auto">
+                Have a question or feedback? We'd love to hear from you.
+              </p>
+            </div>
+            <ContactForm />
+          </div>
+        </section>
+
         {/* Final CTA Section */}
         <section className="bg-green-600">
           <div className="container mx-auto px-4 py-20 text-center">
@@ -144,7 +159,7 @@ const Index = () => {
       <footer className="bg-gray-900 text-white py-12">
         <div className="container mx-auto px-4 text-center">
           <div className="flex items-center justify-center space-x-2 mb-4">
-            <Trophy className="h-6 w-6 text-green-400" />
+            <Circle className="h-6 w-6 text-green-400 fill-current" />
             <h4 className="text-lg font-bold">Footballytics</h4>
           </div>
           <p className="text-gray-400 mb-6 max-w-lg mx-auto">
