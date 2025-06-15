@@ -257,7 +257,8 @@ class FootballAPI {
   }
 
   async fetchMatches(season?: string): Promise<any> {
-    const endpoint = '/eventspastleague.php?id=4328';
+    // For general matches, use the eventsnextleague for upcoming/live matches
+    const endpoint = '/eventsnextleague.php?id=4328';
     const data = await this.fetchData(endpoint);
     
     if (data.events) {
@@ -293,7 +294,7 @@ class FootballAPI {
       return { matches, count: matches.length };
     }
     
-    return data;
+    return { matches: [], count: 0 };
   }
 
   async fetchTeams(competition = 'PL', season?: string): Promise<any> {
@@ -333,12 +334,22 @@ class FootballAPI {
 
   async fetchCompetitionMatches(competition = 'PL', season?: string): Promise<any> {
     const leagueId = this.getLeagueId(competition);
+    
+    // Use different endpoints based on what we want
+    // For past matches, use eventspastleague
+    // For next/upcoming matches, use eventsnextleague
     const endpoint = `/eventspastleague.php?id=${leagueId}`;
     
     const data = await this.fetchData(endpoint);
     
     if (data.events && Array.isArray(data.events)) {
-      const matches = data.events.map((event: any) => ({
+      // Filter events for the specific season if provided
+      let events = data.events;
+      if (season) {
+        events = events.filter((event: any) => event.strSeason === season);
+      }
+      
+      const matches = events.map((event: any) => ({
         id: event.idEvent,
         homeTeam: {
           id: event.idHomeTeam,
@@ -389,12 +400,6 @@ class FootballAPI {
     const endpoint = `/lookuptimeline.php?id=${eventId}`;
     const data = await this.fetchData(endpoint);
     return data.timeline ? data : { timeline: [] };
-  }
-
-  async fetchHighlights(date: string): Promise<any[]> {
-    const endpoint = `/eventshighlights.php?d=${date}`;
-    const data = await this.fetchData(endpoint);
-    return data.events ? data.events : [];
   }
 
   async fetchAnalyticsData(competition = 'PL', season?: string): Promise<any> {
