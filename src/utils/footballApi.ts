@@ -23,55 +23,58 @@ class FootballAPI {
 
     console.log('Attempting to fetch from API:', `${this.baseURL}${endpoint}`);
     
-    // Try different CORS proxy approaches
-    const proxies = [
-      // Try with cors-anywhere (needs to be requested first)
-      () => fetch(`https://cors-anywhere.herokuapp.com/${this.baseURL}${endpoint}`, {
-        headers: {
-          'X-Auth-Token': this.apiKey,
-          'X-Requested-With': 'XMLHttpRequest'
-        }
-      }),
-      // Try with allorigins
-      () => fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(`${this.baseURL}${endpoint}`)}`, {
-        headers: {
-          'X-Auth-Token': this.apiKey
-        }
-      }),
-      // Try with corsproxy.io
-      () => fetch(`https://corsproxy.io/?${encodeURIComponent(`${this.baseURL}${endpoint}`)}`, {
-        headers: {
-          'X-Auth-Token': this.apiKey
-        }
-      }),
+    // Try different approaches to access the API
+    const attempts = [
+      // Try with a more reliable CORS proxy
+      async () => {
+        const proxyUrl = `https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(`${this.baseURL}${endpoint}`)}`;
+        return fetch(proxyUrl, {
+          headers: {
+            'X-Auth-Token': this.apiKey
+          }
+        });
+      },
+      // Try with another CORS proxy
+      async () => {
+        const proxyUrl = `https://cors-anywhere.herokuapp.com/${this.baseURL}${endpoint}`;
+        return fetch(proxyUrl, {
+          headers: {
+            'X-Auth-Token': this.apiKey,
+            'X-Requested-With': 'XMLHttpRequest'
+          }
+        });
+      },
       // Try direct call (will likely fail due to CORS)
-      () => fetch(`${this.baseURL}${endpoint}`, {
-        headers: {
-          'X-Auth-Token': this.apiKey
-        }
-      })
+      async () => {
+        return fetch(`${this.baseURL}${endpoint}`, {
+          headers: {
+            'X-Auth-Token': this.apiKey
+          }
+        });
+      }
     ];
 
-    for (let i = 0; i < proxies.length; i++) {
+    for (let i = 0; i < attempts.length; i++) {
       try {
-        console.log(`Trying proxy method ${i + 1}...`);
-        const response = await proxies[i]();
+        console.log(`Trying API access method ${i + 1}...`);
+        const response = await attempts[i]();
         
         if (response.ok) {
           const data = await response.json();
-          console.log('Successfully fetched real data:', endpoint, data);
+          console.log('Successfully fetched data:', endpoint);
           this.cache.set(cacheKey, { data, timestamp: Date.now() });
           return data;
         } else {
-          console.log(`Proxy ${i + 1} failed with status:`, response.status, response.statusText);
+          console.log(`Method ${i + 1} failed with status:`, response.status, response.statusText);
         }
       } catch (error) {
-        console.log(`Proxy ${i + 1} failed with error:`, error);
+        console.log(`Method ${i + 1} failed with error:`, error);
       }
     }
 
-    console.error('All API attempts failed for:', endpoint);
-    throw new Error(`Failed to fetch data from ${endpoint}. API may be unavailable or CORS blocked.`);
+    // All attempts failed - throw error with helpful message
+    console.error('All API access attempts failed for:', endpoint);
+    throw new Error('Football data is currently unavailable due to API access restrictions. This is a common issue with external APIs in browser environments.');
   }
 
   async fetchMatches(season?: string): Promise<any> {

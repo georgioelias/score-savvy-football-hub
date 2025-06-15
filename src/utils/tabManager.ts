@@ -61,12 +61,17 @@ class TabManager {
         default:
           data = {};
       }
-      console.log('Tab data loaded:', data);
+      console.log('Tab data loaded successfully');
       this.setTabData(data);
     } catch (error) {
       console.error('Error switching tab:', error);
+      
+      // Provide user-friendly error data
+      const errorMessage = error instanceof Error ? error.message : 'Failed to load data';
       this.setTabData({ 
-        error: error instanceof Error ? error.message : 'Failed to load data',
+        error: true,
+        errorMessage: errorMessage,
+        userFriendlyMessage: 'Unable to connect to football data service. This may be due to API access restrictions or network issues.',
         matches: [],
         teams: [],
         standings: []
