@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -258,7 +259,7 @@ const LiveData = () => {
           </p>
         </div>
 
-        {/* Responsive Table */}
+        {/* Responsive Table - Show ALL teams, not just first 5 */}
         <div className="overflow-x-auto bg-white rounded-lg shadow">
           <table className="w-full min-w-[800px]">
             <thead className="bg-gray-50">
@@ -465,7 +466,7 @@ const LiveData = () => {
             <p className="text-gray-500 text-lg">No recent results available</p>
           </div>
         ) : (
-          filteredMatches.slice(0, 20).map((match: any) => (
+          filteredMatches.map((match: any) => (
             <Card key={match.id} className="hover:shadow-md transition-shadow">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
