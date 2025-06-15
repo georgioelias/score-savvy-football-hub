@@ -33,20 +33,22 @@ const StandingsTable: React.FC<StandingsTableProps> = ({ standings, competitionN
     );
   }
 
-  const isGroupStage = competitionName.includes('Champions League') || competitionName.includes('Europa League');
-  const tableTitle = isGroupStage ? 'Group Stage Standings' : 'League Table';
+  // Safe check for competitionName - default to empty string if undefined
+  const safeCompetitionName = competitionName || '';
+  const isGroupStage = false; // Since we removed CL and EL, always false
+  const tableTitle = 'League Table';
 
   return (
     <div className="space-y-4">
       <div className="bg-gradient-to-r from-green-50 to-blue-50 p-4 rounded-lg">
         <div className="flex items-center space-x-2">
-          {isGroupStage ? <Users className="h-5 w-5 text-blue-600" /> : <Trophy className="h-5 w-5 text-green-600" />}
+          <Trophy className="h-5 w-5 text-green-600" />
           <h3 className="text-lg font-semibold text-gray-900">
-            {competitionName} - {seasonName}
+            {safeCompetitionName} - {seasonName}
           </h3>
         </div>
         <p className="text-sm text-gray-600 mt-1">
-          {isGroupStage ? `${tableTitle} with ${standings.length} teams` : `Complete league table with ${standings.length} teams`}
+          Complete league table with {standings.length} teams
         </p>
       </div>
 
@@ -119,19 +121,9 @@ const StandingsTable: React.FC<StandingsTableProps> = ({ standings, competitionN
       <div className="bg-gray-50 p-4 rounded-lg">
         <h4 className="font-semibold text-gray-900 mb-2">Legend</h4>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm">
-          {isGroupStage ? (
-            <>
-              <div className="flex items-center space-x-2"><div className="w-4 h-4 bg-green-100 border border-green-300 rounded"></div><span>Round of 16</span></div>
-              <div className="flex items-center space-x-2"><div className="w-4 h-4 bg-blue-100 border border-blue-300 rounded"></div><span>Europa League</span></div>
-              <div className="flex items-center space-x-2"><div className="w-4 h-4 bg-gray-100 border border-gray-300 rounded"></div><span>Eliminated</span></div>
-            </>
-          ) : (
-            <>
-              <div className="flex items-center space-x-2"><div className="w-4 h-4 bg-green-100 border border-green-300 rounded"></div><span>Champions League</span></div>
-              <div className="flex items-center space-x-2"><div className="w-4 h-4 bg-blue-100 border border-blue-300 rounded"></div><span>Europa League</span></div>
-              <div className="flex items-center space-x-2"><div className="w-4 h-4 bg-red-100 border border-red-300 rounded"></div><span>Relegation</span></div>
-            </>
-          )}
+          <div className="flex items-center space-x-2"><div className="w-4 h-4 bg-green-100 border border-green-300 rounded"></div><span>Champions League</span></div>
+          <div className="flex items-center space-x-2"><div className="w-4 h-4 bg-blue-100 border border-blue-300 rounded"></div><span>Europa League</span></div>
+          <div className="flex items-center space-x-2"><div className="w-4 h-4 bg-red-100 border border-red-300 rounded"></div><span>Relegation</span></div>
         </div>
       </div>
     </div>
