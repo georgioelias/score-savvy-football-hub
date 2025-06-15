@@ -23,7 +23,9 @@ const getPositionColor = (position: number, isGroupStage: boolean = false) => {
 };
 
 const StandingsTable: React.FC<StandingsTableProps> = ({ standings, competitionName, seasonName }) => {
-  if (standings.length === 0) {
+  console.log('StandingsTable received standings:', standings);
+  
+  if (!standings || standings.length === 0) {
     return (
       <div className="text-center py-12">
         <Trophy className="h-12 w-12 text-gray-400 mx-auto mb-4" />
@@ -36,7 +38,6 @@ const StandingsTable: React.FC<StandingsTableProps> = ({ standings, competitionN
   // Safe check for competitionName - default to empty string if undefined
   const safeCompetitionName = competitionName || '';
   const isGroupStage = false; // Since we removed CL and EL, always false
-  const tableTitle = 'League Table';
 
   return (
     <div className="space-y-4">
@@ -70,8 +71,8 @@ const StandingsTable: React.FC<StandingsTableProps> = ({ standings, competitionN
             </tr>
           </thead>
           <tbody>
-            {standings.map((team) => (
-              <tr key={team.position} className="border-b hover:bg-gray-50 transition-colors">
+            {standings.map((team, index) => (
+              <tr key={team.team.id || index} className="border-b hover:bg-gray-50 transition-colors">
                 <td className={`p-3 font-medium ${getPositionColor(team.position, isGroupStage)}`}>{team.position}</td>
                 <td className="p-3">
                   <div className="flex items-center space-x-3">

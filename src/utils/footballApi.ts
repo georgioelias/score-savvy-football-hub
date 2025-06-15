@@ -1,3 +1,4 @@
+
 import { Match, Standing, Team } from '@/types/football';
 
 class FootballAPI {
@@ -54,10 +55,80 @@ class FootballAPI {
         console.warn(`Competition ID not found for ${competition}`);
         return { standings: [] };
       }
+      
       const url = `${this.baseUrl}/lookuptable.php?l=${competitionId}&s=${season}`;
+      console.log(`Fetching standings from: ${url}`);
       const response = await fetch(url);
       const data = await response.json();
-      return { standings: data.table || [] };
+      
+      console.log('Raw standings API response:', data);
+      
+      // TheSportsDB returns standings in data.table array
+      if (!data.table || !Array.isArray(data.table)) {
+        console.warn('No table data in API response, trying without season parameter');
+        
+        // Try without season parameter for current season
+        const fallbackUrl = `${this.baseUrl}/lookuptable.php?l=${competitionId}`;
+        console.log(`Trying fallback URL: ${fallbackUrl}`);
+        const fallbackResponse = await fetch(fallbackUrl);
+        const fallbackData = await fallbackResponse.json();
+        
+        console.log('Fallback standings API response:', fallbackData);
+        
+        if (!fallbackData.table || !Array.isArray(fallbackData.table)) {
+          console.warn('No standings data available from API');
+          return { standings: [] };
+        }
+        
+        // Map the fallback data to our format
+        const mappedStandings = fallbackData.table.map((team: any, index: number) => ({
+          position: parseInt(team.intRank) || (index + 1),
+          team: {
+            id: team.idTeam || `team-${index}`,
+            name: team.strTeam || 'Unknown Team',
+            shortName: team.strTeamShort || team.strTeam || 'Unknown',
+            tla: team.strTeamShort?.substring(0, 3) || 'TLA',
+            crest: team.strTeamBadge || 'https://www.thesportsdb.com/images/media/team/badge/default.png'
+          },
+          playedGames: parseInt(team.intPlayed) || 0,
+          won: parseInt(team.intWin) || 0,
+          draw: parseInt(team.intDraw) || 0,
+          lost: parseInt(team.intLoss) || 0,
+          points: parseInt(team.intPoints) || 0,
+          goalsFor: parseInt(team.intGoalsFor) || 0,
+          goalsAgainst: parseInt(team.intGoalsAgainst) || 0,
+          goalDifference: parseInt(team.intGoalDifference) || 0,
+          form: team.strForm || '-----'
+        }));
+        
+        console.log(`Mapped ${mappedStandings.length} teams from fallback data`);
+        return { standings: mappedStandings };
+      }
+      
+      // Map the TheSportsDB data to our format
+      const mappedStandings = data.table.map((team: any, index: number) => ({
+        position: parseInt(team.intRank) || (index + 1),
+        team: {
+          id: team.idTeam || `team-${index}`,
+          name: team.strTeam || 'Unknown Team',
+          shortName: team.strTeamShort || team.strTeam || 'Unknown',
+          tla: team.strTeamShort?.substring(0, 3) || 'TLA',
+          crest: team.strTeamBadge || 'https://www.thesportsdb.com/images/media/team/badge/default.png'
+        },
+        playedGames: parseInt(team.intPlayed) || 0,
+        won: parseInt(team.intWin) || 0,
+        draw: parseInt(team.intDraw) || 0,
+        lost: parseInt(team.intLoss) || 0,
+        points: parseInt(team.intPoints) || 0,
+        goalsFor: parseInt(team.intGoalsFor) || 0,
+        goalsAgainst: parseInt(team.intGoalsAgainst) || 0,
+        goalDifference: parseInt(team.intGoalDifference) || 0,
+        form: team.strForm || '-----'
+      }));
+      
+      console.log(`Successfully mapped ${mappedStandings.length} teams to standings format`);
+      return { standings: mappedStandings };
+      
     } catch (error) {
       console.error('Error fetching league standings:', error);
       return { standings: [] };
