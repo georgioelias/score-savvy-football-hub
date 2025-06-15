@@ -1,4 +1,3 @@
-
 class FootballAPI {
   public baseURL: string;
   public apiKey: string;
@@ -411,6 +410,24 @@ class FootballAPI {
   private parseGoalscorers(event: any): any[] {
     // TheSportsDB doesn't always have goalscorer data in the basic event endpoint
     return [];
+  }
+
+  async fetchLineup(eventId: string): Promise<any> {
+    const endpoint = `/lookuplineup.php?id=${eventId}`;
+    const data = await this.fetchData(endpoint);
+    return data.lineup ? data : { lineup: [] };
+  }
+
+  async fetchEventStats(eventId: string): Promise<any> {
+    const endpoint = `/lookupeventstats.php?id=${eventId}`;
+    const data = await this.fetchData(endpoint);
+    return data.eventstats ? data : { eventstats: [] };
+  }
+
+  async fetchTimeline(eventId: string): Promise<any> {
+    const endpoint = `/lookuptimeline.php?id=${eventId}`;
+    const data = await this.fetchData(endpoint);
+    return data.timeline ? data : { timeline: [] };
   }
 
   async fetchAnalyticsData(competition = 'PL'): Promise<any> {

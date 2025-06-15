@@ -1,4 +1,3 @@
-
 export interface Team {
   id: string;
   name: string;
@@ -45,3 +44,27 @@ export interface Standing {
   form: string;
 }
 
+export interface LineupPlayer {
+  idPlayer: string;
+  strPlayer: string;
+  strPosition: string;
+  strFormation: string;
+  idTeam: string;
+}
+
+export interface EventStat {
+  strStat: string;
+  intHome: string;
+  intAway: string;
+}
+
+export interface TimelineEvent {
+  idTimeline: string;
+  idEvent: string;
+  strTimeline: string;
+  strTimelineDetail: string;
+  strTeam: string;
+  strPlayer: string;
+  strAssist: string;
+  strTimelineDescription: string;
+}
