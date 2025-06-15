@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -22,7 +21,10 @@ const LiveData = () => {
     'PL': 'Premier League',
     'PD': 'La Liga',
     'SA': 'Serie A',
-    'BL1': 'Bundesliga'
+    'BL1': 'Bundesliga',
+    'FL1': 'Ligue 1',
+    'CL': 'Champions League',
+    'EL': 'Europa League'
   };
 
   const seasons = {
@@ -30,7 +32,9 @@ const LiveData = () => {
     '2023': '2023/24',
     '2022': '2022/23',
     '2021': '2021/22',
-    '2020': '2020/21'
+    '2020': '2020/21',
+    '2019': '2019/20',
+    '2018': '2018/19'
   };
 
   useEffect(() => {
@@ -183,48 +187,105 @@ const LiveData = () => {
         </div>
       );
     }
+
+    const getPositionColor = (position: number) => {
+      if (position <= 4) return 'text-green-600 bg-green-50'; // Champions League
+      if (position <= 6) return 'text-blue-600 bg-blue-50'; // Europa League
+      if (position >= 18) return 'text-red-600 bg-red-50'; // Relegation
+      return 'text-gray-700';
+    };
     
     return (
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b">
-              <th className="text-left p-2">Pos</th>
-              <th className="text-left p-2">Team</th>
-              <th className="text-center p-2">P</th>
-              <th className="text-center p-2">W</th>
-              <th className="text-center p-2">D</th>
-              <th className="text-center p-2">L</th>
-              <th className="text-center p-2">GF</th>
-              <th className="text-center p-2">GA</th>
-              <th className="text-center p-2">GD</th>
-              <th className="text-center p-2">Pts</th>
-            </tr>
-          </thead>
-          <tbody>
-            {standings.map((team: any) => (
-              <tr key={team.position} className="border-b hover:bg-gray-50">
-                <td className="p-2 font-semibold">{team.position}</td>
-                <td className="p-2">
-                  <div className="flex items-center space-x-2">
-                    {team.team.crest && (
-                      <img src={team.team.crest} alt={team.team.name} className="w-6 h-6" />
-                    )}
-                    <span className="font-medium">{team.team.name}</span>
-                  </div>
-                </td>
-                <td className="text-center p-2">{team.playedGames}</td>
-                <td className="text-center p-2">{team.won}</td>
-                <td className="text-center p-2">{team.draw}</td>
-                <td className="text-center p-2">{team.lost}</td>
-                <td className="text-center p-2">{team.goalsFor}</td>
-                <td className="text-center p-2">{team.goalsAgainst}</td>
-                <td className="text-center p-2">{team.goalsFor - team.goalsAgainst}</td>
-                <td className="text-center p-2 font-bold">{team.points}</td>
+      <div className="space-y-4">
+        {/* Competition and Season Info */}
+        <div className="bg-gradient-to-r from-green-50 to-blue-50 p-4 rounded-lg">
+          <h3 className="text-lg font-semibold text-gray-900">
+            {tabData.competition?.name || competitions[selectedCompetition]} - {seasons[selectedSeason]}
+          </h3>
+          <p className="text-sm text-gray-600 mt-1">
+            Complete league table with {standings.length} teams
+          </p>
+        </div>
+
+        {/* Responsive Table */}
+        <div className="overflow-x-auto bg-white rounded-lg shadow">
+          <table className="w-full min-w-[800px]">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="text-left p-3 font-semibold text-gray-700">Pos</th>
+                <th className="text-left p-3 font-semibold text-gray-700">Team</th>
+                <th className="text-center p-3 font-semibold text-gray-700">P</th>
+                <th className="text-center p-3 font-semibold text-gray-700">W</th>
+                <th className="text-center p-3 font-semibold text-gray-700">D</th>
+                <th className="text-center p-3 font-semibold text-gray-700">L</th>
+                <th className="text-center p-3 font-semibold text-gray-700">GF</th>
+                <th className="text-center p-3 font-semibold text-gray-700">GA</th>
+                <th className="text-center p-3 font-semibold text-gray-700">GD</th>
+                <th className="text-center p-3 font-semibold text-gray-700">Pts</th>
+                <th className="text-center p-3 font-semibold text-gray-700">Form</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {standings.map((team: any) => (
+                <tr key={team.position} className="border-b hover:bg-gray-50 transition-colors">
+                  <td className={`p-3 font-bold rounded-l ${getPositionColor(team.position)}`}>
+                    {team.position}
+                  </td>
+                  <td className="p-3">
+                    <div className="flex items-center space-x-3">
+                      {team.team.crest && (
+                        <img 
+                          src={team.team.crest} 
+                          alt={team.team.name} 
+                          className="w-8 h-8 object-contain" 
+                          onError={(e) => {
+                            e.currentTarget.src = 'https://www.thesportsdb.com/images/media/team/badge/default.png';
+                          }}
+                        />
+                      )}
+                      <div>
+                        <span className="font-semibold text-gray-900">{team.team.name}</span>
+                        <div className="text-xs text-gray-500">{team.team.tla}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="text-center p-3 text-gray-700">{team.playedGames}</td>
+                  <td className="text-center p-3 text-green-600 font-medium">{team.won}</td>
+                  <td className="text-center p-3 text-yellow-600 font-medium">{team.draw}</td>
+                  <td className="text-center p-3 text-red-600 font-medium">{team.lost}</td>
+                  <td className="text-center p-3 text-gray-700">{team.goalsFor}</td>
+                  <td className="text-center p-3 text-gray-700">{team.goalsAgainst}</td>
+                  <td className={`text-center p-3 font-medium ${team.goalDifference >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {team.goalDifference >= 0 ? '+' : ''}{team.goalDifference}
+                  </td>
+                  <td className="text-center p-3 font-bold text-gray-900">{team.points}</td>
+                  <td className="text-center p-3">
+                    <span className="text-xs bg-gray-100 px-2 py-1 rounded">{team.form}</span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Legend */}
+        <div className="bg-gray-50 p-4 rounded-lg">
+          <h4 className="font-semibold text-gray-900 mb-2">Position Legend</h4>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm">
+            <div className="flex items-center space-x-2">
+              <div className="w-4 h-4 bg-green-100 border border-green-300 rounded"></div>
+              <span>1-4: Champions League</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="w-4 h-4 bg-blue-100 border border-blue-300 rounded"></div>
+              <span>5-6: Europa League</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="w-4 h-4 bg-red-100 border border-red-300 rounded"></div>
+              <span>18-20: Relegation</span>
+            </div>
+          </div>
+        </div>
       </div>
     );
   };
@@ -243,25 +304,71 @@ const LiveData = () => {
     }
     
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {teams.map((team: any) => (
-          <Card key={team.id} className="hover:shadow-md transition-shadow">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg flex items-center space-x-2">
-                {team.crest && (
-                  <img src={team.crest} alt={team.name} className="w-8 h-8" />
-                )}
-                <span>{team.name}</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2 text-sm">
-                <p><span className="font-medium">Founded:</span> {team.founded}</p>
-                <p><span className="font-medium">Venue:</span> {team.venue}</p>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+      <div className="space-y-4">
+        {/* Competition Info */}
+        <div className="bg-gradient-to-r from-green-50 to-blue-50 p-4 rounded-lg">
+          <h3 className="text-lg font-semibold text-gray-900">
+            {competitions[selectedCompetition]} Teams - {seasons[selectedSeason]}
+          </h3>
+          <p className="text-sm text-gray-600 mt-1">
+            {teams.length} teams in the competition
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {teams.map((team: any) => (
+            <Card key={team.id} className="hover:shadow-lg transition-shadow duration-200">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg flex items-center space-x-3">
+                  {team.crest && (
+                    <img 
+                      src={team.crest} 
+                      alt={team.name} 
+                      className="w-10 h-10 object-contain"
+                      onError={(e) => {
+                        e.currentTarget.src = 'https://www.thesportsdb.com/images/media/team/badge/default.png';
+                      }}
+                    />
+                  )}
+                  <div>
+                    <span className="text-gray-900">{team.name}</span>
+                    <div className="text-sm text-gray-500 font-normal">{team.tla}</div>
+                  </div>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3 text-sm">
+                  <div className="flex justify-between">
+                    <span className="font-medium text-gray-600">Founded:</span>
+                    <span className="text-gray-900">{team.founded || 'N/A'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-medium text-gray-600">Stadium:</span>
+                    <span className="text-gray-900 text-right">{team.venue}</span>
+                  </div>
+                  {team.location && (
+                    <div className="flex justify-between">
+                      <span className="font-medium text-gray-600">Location:</span>
+                      <span className="text-gray-900 text-right">{team.location}</span>
+                    </div>
+                  )}
+                  {team.website && (
+                    <div className="pt-2">
+                      <a 
+                        href={`https://${team.website}`} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:text-blue-800 text-xs underline"
+                      >
+                        Official Website
+                      </a>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
     );
   };
