@@ -1,4 +1,3 @@
-
 class FootballAPI {
   public baseURL: string;
   public apiKey: string;
@@ -51,7 +50,7 @@ class FootballAPI {
           {
             idTeam: "133604",
             strTeam: "Arsenal",
-            strShort: "ARS",
+            strTeamShort: "ARS",
             strBadge: "https://www.thesportsdb.com/images/media/team/badge/arsenal.png",
             intFormedYear: "1886",
             strStadium: "Emirates Stadium"
@@ -59,7 +58,7 @@ class FootballAPI {
           {
             idTeam: "133612", 
             strTeam: "Chelsea",
-            strShort: "CHE", 
+            strTeamShort: "CHE", 
             strBadge: "https://www.thesportsdb.com/images/media/team/badge/chelsea.png",
             intFormedYear: "1905",
             strStadium: "Stamford Bridge"
@@ -67,7 +66,7 @@ class FootballAPI {
           {
             idTeam: "133602",
             strTeam: "Liverpool",
-            strShort: "LIV",
+            strTeamShort: "LIV",
             strBadge: "https://www.thesportsdb.com/images/media/team/badge/liverpool.png", 
             intFormedYear: "1892",
             strStadium: "Anfield"
@@ -75,7 +74,7 @@ class FootballAPI {
           {
             idTeam: "133613",
             strTeam: "Manchester City",
-            strShort: "MCI",
+            strTeamShort: "MCI",
             strBadge: "https://www.thesportsdb.com/images/media/team/badge/manchester_city.png",
             intFormedYear: "1880", 
             strStadium: "Etihad Stadium"
@@ -121,40 +120,43 @@ class FootballAPI {
       return {
         table: [
           {
-            name: "Liverpool",
-            teamid: "133602",
-            played: 15,
-            goalsfor: 29,
-            goalsagainst: 8,
-            goalsdifference: 21,
-            win: 11,
-            draw: 3,
-            loss: 1,
-            total: 36
+            intRank: "1",
+            idTeam: "133602",
+            strTeam: "Liverpool",
+            intPlayed: "15",
+            intWin: "11",
+            intDraw: "3",
+            intLoss: "1",
+            intGoalsFor: "29",
+            intGoalsAgainst: "8",
+            intGoalDifference: "21",
+            intPoints: "36"
           },
           {
-            name: "Arsenal", 
-            teamid: "133604",
-            played: 15,
-            goalsfor: 26,
-            goalsagainst: 12,
-            goalsdifference: 14,
-            win: 9,
-            draw: 5,
-            loss: 1,
-            total: 32
+            intRank: "2",
+            idTeam: "133604", 
+            strTeam: "Arsenal",
+            intPlayed: "15",
+            intWin: "9",
+            intDraw: "5", 
+            intLoss: "1",
+            intGoalsFor: "26",
+            intGoalsAgainst: "12",
+            intGoalDifference: "14",
+            intPoints: "32"
           },
           {
-            name: "Manchester City",
-            teamid: "133613", 
-            played: 15,
-            goalsfor: 31,
-            goalsagainst: 15,
-            goalsdifference: 16,
-            win: 9,
-            draw: 4,
-            loss: 2,
-            total: 31
+            intRank: "3",
+            idTeam: "133613",
+            strTeam: "Manchester City", 
+            intPlayed: "15",
+            intWin: "9",
+            intDraw: "4",
+            intLoss: "2",
+            intGoalsFor: "31",
+            intGoalsAgainst: "15",
+            intGoalDifference: "16",
+            intPoints: "31"
           }
         ]
       };
@@ -208,26 +210,30 @@ class FootballAPI {
     const endpoint = '/lookuptable.php?l=4328';
     const data = await this.fetchData(endpoint);
     
+    console.log('Raw standings data from API:', data);
+    
     // Transform TheSportsDB format to our expected format
-    if (data.table) {
+    if (data.table && Array.isArray(data.table)) {
       const table = data.table.map((team: any, index: number) => ({
-        position: index + 1,
+        position: parseInt(team.intRank) || (index + 1),
         team: {
-          id: team.teamid,
-          name: team.name,
-          shortName: team.name,
-          tla: team.name?.substring(0, 3).toUpperCase(),
-          crest: `https://www.thesportsdb.com/images/media/team/badge/default.png`
+          id: team.idTeam,
+          name: team.strTeam,
+          shortName: team.strTeam,
+          tla: team.strTeam?.substring(0, 3).toUpperCase(),
+          crest: team.strBadge || `https://www.thesportsdb.com/images/media/team/badge/default.png`
         },
-        playedGames: parseInt(team.played) || 0,
-        won: parseInt(team.win) || 0,
-        draw: parseInt(team.draw) || 0,
-        lost: parseInt(team.loss) || 0,
-        points: parseInt(team.total) || 0,
-        goalsFor: parseInt(team.goalsfor) || 0,
-        goalsAgainst: parseInt(team.goalsagainst) || 0,
-        goalDifference: parseInt(team.goalsdifference) || 0
+        playedGames: parseInt(team.intPlayed) || 0,
+        won: parseInt(team.intWin) || 0,
+        draw: parseInt(team.intDraw) || 0,
+        lost: parseInt(team.intLoss) || 0,
+        points: parseInt(team.intPoints) || 0,
+        goalsFor: parseInt(team.intGoalsFor) || 0,
+        goalsAgainst: parseInt(team.intGoalsAgainst) || 0,
+        goalDifference: parseInt(team.intGoalDifference) || 0
       }));
+      
+      console.log('Transformed standings data:', table);
       
       return {
         standings: [{
@@ -252,8 +258,8 @@ class FootballAPI {
       const teams = data.teams.map((team: any) => ({
         id: team.idTeam,
         name: team.strTeam,
-        shortName: team.strShort || team.strTeam,
-        tla: team.strShort || team.strTeam?.substring(0, 3).toUpperCase(),
+        shortName: team.strTeamShort || team.strTeam,
+        tla: team.strTeamShort || team.strTeam?.substring(0, 3).toUpperCase(),
         crest: team.strBadge || `https://www.thesportsdb.com/images/media/team/badge/default.png`,
         founded: parseInt(team.intFormedYear) || null,
         venue: team.strStadium || 'Unknown Stadium'
