@@ -49,6 +49,14 @@ class TabManager {
         case 'team-stats':
           console.log('Fetching teams info for:', competition, 'season:', season);
           data = await this.api.fetchTeams(competition, season);
+          console.log('Fetched teams data:', data);
+          // Ensure we have a valid teams array
+          if (!data.teams || !Array.isArray(data.teams)) {
+            console.warn('No teams data received, using empty array');
+            data = { teams: [] };
+          } else {
+            console.log(`Successfully fetched ${data.teams.length} teams for ${competition}`);
+          }
           break;
         case 'recent-results':
           console.log('Fetching recent results for competition:', competition, 'season:', season);
