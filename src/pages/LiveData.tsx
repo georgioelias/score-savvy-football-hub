@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -146,7 +147,7 @@ const LiveData = () => {
 
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">Live Scores & Standings</h2>
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">Data</h2>
           
           <div className="flex flex-col sm:flex-row gap-4 mb-6">
             <Select value={selectedCompetition} onValueChange={setSelectedCompetition}>
