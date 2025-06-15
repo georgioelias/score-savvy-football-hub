@@ -6,146 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Link } from 'react-router-dom';
 import { Trophy, RefreshCw, Clock, Users } from 'lucide-react';
-
-// Football API Class
-class FootballAPI {
-  public baseURL: string;
-  public apiKey: string;
-  public cache: Map<string, any>;
-  public cacheExpiry: number;
-
-  constructor() {
-    this.baseURL = 'https://api.football-data.org/v4';
-    this.apiKey = 'a190c805c6844acab2e22d433d92e402';
-    this.cache = new Map();
-    this.cacheExpiry = 600000; // 10 minutes
-  }
-
-  async fetchData(endpoint: string): Promise<any> {
-    const cacheKey = endpoint;
-    const cached = this.cache.get(cacheKey);
-    
-    if (cached && (Date.now() - cached.timestamp) < this.cacheExpiry) {
-      return cached.data;
-    }
-
-    try {
-      const response = await fetch(`${this.baseURL}${endpoint}`, {
-        headers: {
-          'X-Auth-Token': this.apiKey
-        }
-      });
-      
-      if (!response.ok) {
-        throw new Error(`API Error: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      this.cache.set(cacheKey, { data, timestamp: Date.now() });
-      return data;
-    } catch (error) {
-      console.error('API fetch error:', error);
-      return this.getFallbackData(endpoint);
-    }
-  }
-
-  async fetchMatches(): Promise<any> {
-    return await this.fetchData('/matches');
-  }
-
-  async fetchStandings(competition = 'PL'): Promise<any> {
-    return await this.fetchData(`/competitions/${competition}/standings`);
-  }
-
-  async fetchTeams(competition = 'PL'): Promise<any> {
-    return await this.fetchData(`/competitions/${competition}/teams`);
-  }
-
-  getFallbackData(endpoint: string): any {
-    if (endpoint.includes('standings')) {
-      return {
-        standings: [{
-          table: [
-            { position: 1, team: { name: 'Manchester City', crest: '' }, points: 28, playedGames: 12, won: 9, draw: 1, lost: 2, goalsFor: 31, goalsAgainst: 9 },
-            { position: 2, team: { name: 'Arsenal', crest: '' }, points: 27, playedGames: 12, won: 8, draw: 3, lost: 1, goalsFor: 28, goalsAgainst: 12 },
-            { position: 3, team: { name: 'Liverpool', crest: '' }, points: 25, playedGames: 12, won: 7, draw: 4, lost: 1, goalsFor: 26, goalsAgainst: 11 },
-            { position: 4, team: { name: 'Chelsea', crest: '' }, points: 22, playedGames: 12, won: 6, draw: 4, lost: 2, goalsFor: 23, goalsAgainst: 14 }
-          ]
-        }]
-      };
-    }
-    
-    if (endpoint.includes('matches')) {
-      return {
-        matches: [
-          { id: 1, homeTeam: { name: 'Manchester United' }, awayTeam: { name: 'Chelsea' }, score: { fullTime: { home: 2, away: 1 } }, status: 'FINISHED', utcDate: new Date().toISOString() },
-          { id: 2, homeTeam: { name: 'Arsenal' }, awayTeam: { name: 'Liverpool' }, score: { fullTime: { home: null, away: null } }, status: 'SCHEDULED', utcDate: new Date(Date.now() + 3600000).toISOString() }
-        ]
-      };
-    }
-    
-    if (endpoint.includes('teams')) {
-      return {
-        teams: [
-          { id: 1, name: 'Manchester City', founded: 1880, venue: 'Etihad Stadium' },
-          { id: 2, name: 'Arsenal', founded: 1886, venue: 'Emirates Stadium' },
-          { id: 3, name: 'Liverpool', founded: 1892, venue: 'Anfield' },
-          { id: 4, name: 'Chelsea', founded: 1905, venue: 'Stamford Bridge' }
-        ]
-      };
-    }
-    
-    return { error: 'No data available' };
-  }
-}
-
-// Tab Manager Class
-class TabManager {
-  public activeTab: string;
-  public setActiveTab: (tab: string) => void;
-  public setTabData: (data: any) => void;
-  public setLoading: (loading: boolean) => void;
-  public api: FootballAPI;
-
-  constructor(activeTab: string, setActiveTab: (tab: string) => void, setTabData: (data: any) => void, setLoading: (loading: boolean) => void) {
-    this.activeTab = activeTab;
-    this.setActiveTab = setActiveTab;
-    this.setTabData = setTabData;
-    this.setLoading = setLoading;
-    this.api = new FootballAPI();
-  }
-
-  async switchTab(tabId: string, competition = 'PL'): Promise<void> {
-    this.setActiveTab(tabId);
-    this.setLoading(true);
-    
-    try {
-      let data;
-      switch (tabId) {
-        case 'live-matches':
-          data = await this.api.fetchMatches();
-          break;
-        case 'league-tables':
-          data = await this.api.fetchStandings(competition);
-          break;
-        case 'team-stats':
-          data = await this.api.fetchTeams(competition);
-          break;
-        case 'recent-results':
-          data = await this.api.fetchMatches();
-          break;
-        default:
-          data = {};
-      }
-      this.setTabData(data);
-    } catch (error) {
-      console.error('Error switching tab:', error);
-      this.setTabData({ error: 'Failed to load data' });
-    } finally {
-      this.setLoading(false);
-    }
-  }
-}
+import TabManager from '../utils/tabManager';
 
 const LiveData = () => {
   const [activeTab, setActiveTab] = useState('live-matches');
@@ -164,13 +25,16 @@ const LiveData = () => {
   };
 
   useEffect(() => {
+    console.log('Effect triggered - switching tab:', activeTab, 'competition:', selectedCompetition);
     tabManager.switchTab(activeTab, selectedCompetition);
   }, [activeTab, selectedCompetition]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (autoRefresh) {
+      console.log('Auto-refresh enabled');
       interval = setInterval(() => {
+        console.log('Auto-refreshing data...');
         tabManager.switchTab(activeTab, selectedCompetition);
       }, 30000); // Refresh every 30 seconds
     }
@@ -203,6 +67,7 @@ const LiveData = () => {
 
   const renderMatches = () => {
     const matches = tabData.matches || [];
+    console.log('Rendering matches:', matches);
     
     return (
       <div className="space-y-4">
@@ -230,11 +95,14 @@ const LiveData = () => {
                     </div>
                   </div>
                   <div className="text-right">
-                    <Badge variant={match.status === 'IN_PLAY' ? 'destructive' : 'secondary'}>
+                    <Badge variant={match.status === 'IN_PLAY' ? 'destructive' : match.status === 'FINISHED' ? 'secondary' : 'default'}>
                       {match.status === 'IN_PLAY' ? 'LIVE' : match.status}
                     </Badge>
                     <p className="text-sm text-gray-500 mt-1">
                       {new Date(match.utcDate).toLocaleDateString()}
+                    </p>
+                    <p className="text-xs text-gray-400">
+                      {match.competition?.name || 'Football'}
                     </p>
                   </div>
                 </div>
@@ -248,6 +116,7 @@ const LiveData = () => {
 
   const renderStandings = () => {
     const standings = tabData.standings?.[0]?.table || [];
+    console.log('Rendering standings:', standings);
     
     return (
       <div className="overflow-x-auto">
@@ -272,6 +141,9 @@ const LiveData = () => {
                 <td className="p-2 font-semibold">{team.position}</td>
                 <td className="p-2">
                   <div className="flex items-center space-x-2">
+                    {team.team.crest && (
+                      <img src={team.team.crest} alt={team.team.name} className="w-6 h-6" />
+                    )}
                     <span className="font-medium">{team.team.name}</span>
                   </div>
                 </td>
@@ -293,13 +165,19 @@ const LiveData = () => {
 
   const renderTeams = () => {
     const teams = tabData.teams || [];
+    console.log('Rendering teams:', teams);
     
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {teams.map((team: any) => (
           <Card key={team.id} className="hover:shadow-md transition-shadow">
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg">{team.name}</CardTitle>
+              <CardTitle className="text-lg flex items-center space-x-2">
+                {team.crest && (
+                  <img src={team.crest} alt={team.name} className="w-8 h-8" />
+                )}
+                <span>{team.name}</span>
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-2 text-sm">
@@ -315,6 +193,7 @@ const LiveData = () => {
 
   const renderRecentResults = () => {
     const matches = tabData.matches?.filter((match: any) => match.status === 'FINISHED') || [];
+    console.log('Rendering recent results:', matches);
     
     return (
       <div className="space-y-4">
@@ -342,6 +221,9 @@ const LiveData = () => {
                     <Badge variant="secondary">FINISHED</Badge>
                     <p className="text-sm text-gray-500 mt-1">
                       {new Date(match.utcDate).toLocaleDateString()}
+                    </p>
+                    <p className="text-xs text-gray-400">
+                      {match.competition?.name || 'Football'}
                     </p>
                   </div>
                 </div>
@@ -396,6 +278,15 @@ const LiveData = () => {
             >
               <RefreshCw className={`h-4 w-4 ${autoRefresh ? 'animate-spin' : ''}`} />
               <span>Auto Refresh</span>
+            </Button>
+
+            <Button
+              variant="outline"
+              onClick={() => tabManager.switchTab(activeTab, selectedCompetition)}
+              className="flex items-center space-x-2"
+            >
+              <RefreshCw className="h-4 w-4" />
+              <span>Refresh Now</span>
             </Button>
           </div>
 
