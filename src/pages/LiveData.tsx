@@ -214,7 +214,7 @@ const LiveData = () => {
           {showMatchdayFilter && availableMatchdays.length > 0 && (
             <div className="flex items-center space-x-4 mb-6">
               <span className="text-sm font-medium text-gray-700">Filter by Matchday:</span>
-              <Select value={selectedMatchday} onValuechange={setSelectedMatchday}>
+              <Select value={selectedMatchday} onValueChange={setSelectedMatchday}>
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder="All Matchdays" />
                 </SelectTrigger>
