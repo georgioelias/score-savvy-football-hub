@@ -44,7 +44,26 @@ class TabManager {
           break;
         case 'league-tables':
           console.log('Fetching league standings for:', competition, 'season:', season);
-          data = await this.api.fetchStandings(competition, season);
+          const standingsResponse = await this.api.fetchStandings(competition, season);
+          console.log('Standings response from API:', standingsResponse);
+          
+          // Ensure we pass the standings array directly to the component
+          if (standingsResponse && standingsResponse.standings && standingsResponse.standings.length > 0) {
+            data = {
+              standings: standingsResponse.standings,
+              competition: standingsResponse.competition,
+              season: standingsResponse.season
+            };
+            console.log('Processed standings data:', data);
+          } else {
+            console.warn('No standings data available');
+            data = {
+              standings: [],
+              competition: { name: competition },
+              season: { startDate: season, endDate: season },
+              error: 'No standings data available'
+            };
+          }
           break;
         case 'team-stats':
           console.log('Fetching teams info for:', competition, 'season:', season);
@@ -71,7 +90,7 @@ class TabManager {
           data = {};
       }
       
-      console.log('Tab data loaded successfully');
+      console.log('Tab data loaded successfully for', tabId, ':', data);
       this.setTabData(data);
       
       // Show success notification

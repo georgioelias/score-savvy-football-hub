@@ -24,8 +24,17 @@ const getPositionColor = (position: number, isGroupStage: boolean = false) => {
 
 const StandingsTable: React.FC<StandingsTableProps> = ({ standings, competitionName, seasonName }) => {
   console.log('StandingsTable received standings:', standings);
+  console.log('StandingsTable received competitionName:', competitionName);
+  console.log('StandingsTable received seasonName:', seasonName);
   
-  if (!standings || standings.length === 0) {
+  // Handle case where standings might be nested in array structure
+  let actualStandings = standings;
+  if (Array.isArray(standings) && standings.length > 0 && standings[0].table) {
+    actualStandings = standings[0].table;
+    console.log('Extracted standings from nested structure:', actualStandings);
+  }
+  
+  if (!actualStandings || actualStandings.length === 0) {
     return (
       <div className="text-center py-12">
         <Trophy className="h-12 w-12 text-gray-400 mx-auto mb-4" />
@@ -49,7 +58,7 @@ const StandingsTable: React.FC<StandingsTableProps> = ({ standings, competitionN
           </h3>
         </div>
         <p className="text-sm text-gray-600 mt-1">
-          Complete league table with {standings.length} teams
+          Complete league table with {actualStandings.length} teams
         </p>
       </div>
 
@@ -71,7 +80,7 @@ const StandingsTable: React.FC<StandingsTableProps> = ({ standings, competitionN
             </tr>
           </thead>
           <tbody>
-            {standings.map((team, index) => (
+            {actualStandings.map((team, index) => (
               <tr key={team.team.id || index} className="border-b hover:bg-gray-50 transition-colors">
                 <td className={`p-3 font-medium ${getPositionColor(team.position, isGroupStage)}`}>{team.position}</td>
                 <td className="p-3">
