@@ -9,6 +9,11 @@ import { Trophy, RefreshCw, Clock, Users } from 'lucide-react';
 
 // Football API Class
 class FootballAPI {
+  public baseURL: string;
+  public apiKey: string;
+  public cache: Map<string, any>;
+  public cacheExpiry: number;
+
   constructor() {
     this.baseURL = 'https://api.football-data.org/v4';
     this.apiKey = 'a190c805c6844acab2e22d433d92e402';
@@ -16,7 +21,7 @@ class FootballAPI {
     this.cacheExpiry = 600000; // 10 minutes
   }
 
-  async fetchData(endpoint) {
+  async fetchData(endpoint: string): Promise<any> {
     const cacheKey = endpoint;
     const cached = this.cache.get(cacheKey);
     
@@ -44,19 +49,19 @@ class FootballAPI {
     }
   }
 
-  async fetchMatches() {
+  async fetchMatches(): Promise<any> {
     return await this.fetchData('/matches');
   }
 
-  async fetchStandings(competition = 'PL') {
+  async fetchStandings(competition = 'PL'): Promise<any> {
     return await this.fetchData(`/competitions/${competition}/standings`);
   }
 
-  async fetchTeams(competition = 'PL') {
+  async fetchTeams(competition = 'PL'): Promise<any> {
     return await this.fetchData(`/competitions/${competition}/teams`);
   }
 
-  getFallbackData(endpoint) {
+  getFallbackData(endpoint: string): any {
     if (endpoint.includes('standings')) {
       return {
         standings: [{
@@ -96,7 +101,13 @@ class FootballAPI {
 
 // Tab Manager Class
 class TabManager {
-  constructor(activeTab, setActiveTab, setTabData, setLoading) {
+  public activeTab: string;
+  public setActiveTab: (tab: string) => void;
+  public setTabData: (data: any) => void;
+  public setLoading: (loading: boolean) => void;
+  public api: FootballAPI;
+
+  constructor(activeTab: string, setActiveTab: (tab: string) => void, setTabData: (data: any) => void, setLoading: (loading: boolean) => void) {
     this.activeTab = activeTab;
     this.setActiveTab = setActiveTab;
     this.setTabData = setTabData;
@@ -104,7 +115,7 @@ class TabManager {
     this.api = new FootballAPI();
   }
 
-  async switchTab(tabId, competition = 'PL') {
+  async switchTab(tabId: string, competition = 'PL'): Promise<void> {
     this.setActiveTab(tabId);
     this.setLoading(true);
     
@@ -138,7 +149,7 @@ class TabManager {
 
 const LiveData = () => {
   const [activeTab, setActiveTab] = useState('live-matches');
-  const [tabData, setTabData] = useState({});
+  const [tabData, setTabData] = useState<any>({});
   const [loading, setLoading] = useState(true);
   const [selectedCompetition, setSelectedCompetition] = useState('PL');
   const [autoRefresh, setAutoRefresh] = useState(false);
@@ -157,7 +168,7 @@ const LiveData = () => {
   }, [activeTab, selectedCompetition]);
 
   useEffect(() => {
-    let interval;
+    let interval: NodeJS.Timeout;
     if (autoRefresh) {
       interval = setInterval(() => {
         tabManager.switchTab(activeTab, selectedCompetition);
@@ -198,7 +209,7 @@ const LiveData = () => {
         {matches.length === 0 ? (
           <p className="text-center text-gray-500 py-8">No matches available</p>
         ) : (
-          matches.map((match) => (
+          matches.map((match: any) => (
             <Card key={match.id} className="hover:shadow-md transition-shadow">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
@@ -256,7 +267,7 @@ const LiveData = () => {
             </tr>
           </thead>
           <tbody>
-            {standings.map((team) => (
+            {standings.map((team: any) => (
               <tr key={team.position} className="border-b hover:bg-gray-50">
                 <td className="p-2 font-semibold">{team.position}</td>
                 <td className="p-2">
@@ -285,7 +296,7 @@ const LiveData = () => {
     
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {teams.map((team) => (
+        {teams.map((team: any) => (
           <Card key={team.id} className="hover:shadow-md transition-shadow">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg">{team.name}</CardTitle>
@@ -303,14 +314,14 @@ const LiveData = () => {
   };
 
   const renderRecentResults = () => {
-    const matches = tabData.matches?.filter(match => match.status === 'FINISHED') || [];
+    const matches = tabData.matches?.filter((match: any) => match.status === 'FINISHED') || [];
     
     return (
       <div className="space-y-4">
         {matches.length === 0 ? (
           <p className="text-center text-gray-500 py-8">No recent results available</p>
         ) : (
-          matches.slice(0, 10).map((match) => (
+          matches.slice(0, 10).map((match: any) => (
             <Card key={match.id} className="hover:shadow-md transition-shadow">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
