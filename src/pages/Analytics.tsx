@@ -170,7 +170,7 @@ const Analytics = () => {
               </SelectContent>
             </Select>
             {seasons.length > 0 && selectedSeason && (
-              <Select value={selectedSeason} onValuechange={setSelectedSeason}>
+              <Select value={selectedSeason} onValueChange={setSelectedSeason}>
                 <SelectTrigger className="w-full sm:w-[200px]">
                   <SelectValue placeholder="Select Season" />
                 </SelectTrigger>
