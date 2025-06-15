@@ -208,33 +208,137 @@ class FootballAPI {
   }
 
   private getMockStandingsData(competition: string, season?: string): any {
-    const mockTables: { [key: string]: any } = {
-      // La Liga 2023-2024 season data
-      'PD': season === '2023-2024' ? [
-        { position: 1, team: { name: 'Real Madrid', tla: 'RMA', crest: 'https://www.thesportsdb.com/images/media/team/badge/real_madrid.png' }, playedGames: 38, won: 29, draw: 6, lost: 3, points: 95, goalsFor: 87, goalsAgainst: 26, goalDifference: 61, form: 'WWWDW' },
-        { position: 2, team: { name: 'Barcelona', tla: 'BAR', crest: 'https://www.thesportsdb.com/images/media/team/badge/barcelona.png' }, playedGames: 38, won: 27, draw: 7, lost: 4, points: 85, goalsFor: 79, goalsAgainst: 32, goalDifference: 47, form: 'WDWWL' },
-        { position: 3, team: { name: 'Girona', tla: 'GIR', crest: 'https://www.thesportsdb.com/images/media/team/badge/girona.png' }, playedGames: 38, won: 25, draw: 8, lost: 5, points: 81, goalsFor: 85, goalsAgainst: 46, goalDifference: 39, form: 'WWLDW' },
-        { position: 4, team: { name: 'Atletico Madrid', tla: 'ATM', crest: 'https://www.thesportsdb.com/images/media/team/badge/atletico_madrid.png' }, playedGames: 38, won: 24, draw: 8, lost: 6, points: 76, goalsFor: 70, goalsAgainst: 43, goalDifference: 27, form: 'WDWLW' },
-        { position: 5, team: { name: 'Athletic Bilbao', tla: 'ATH', crest: 'https://www.thesportsdb.com/images/media/team/badge/athletic_bilbao.png' }, playedGames: 38, won: 19, draw: 13, lost: 6, points: 68, goalsFor: 61, goalsAgainst: 37, goalDifference: 24, form: 'DWDWW' }
-      ] : [],
-      // Ligue 1 2023-2024 season data  
-      'FL1': season === '2023-2024' ? [
-        { position: 1, team: { name: 'Paris Saint-Germain', tla: 'PSG', crest: 'https://www.thesportsdb.com/images/media/team/badge/psg.png' }, playedGames: 34, won: 26, draw: 6, lost: 2, points: 84, goalsFor: 89, goalsAgainst: 35, goalDifference: 54, form: 'WWDWW' },
-        { position: 2, team: { name: 'AS Monaco', tla: 'MON', crest: 'https://www.thesportsdb.com/images/media/team/badge/monaco.png' }, playedGames: 34, won: 21, draw: 9, lost: 4, points: 72, goalsFor: 68, goalsAgainst: 34, goalDifference: 34, form: 'WDWWD' },
-        { position: 3, team: { name: 'Brest', tla: 'BRE', crest: 'https://www.thesportsdb.com/images/media/team/badge/brest.png' }, playedGames: 34, won: 18, draw: 11, lost: 5, points: 65, goalsFor: 56, goalsAgainst: 38, goalDifference: 18, form: 'DWDWL' },
-        { position: 4, team: { name: 'Lille', tla: 'LIL', crest: 'https://www.thesportsdb.com/images/media/team/badge/lille.png' }, playedGames: 34, won: 18, draw: 10, lost: 6, points: 64, goalsFor: 54, goalsAgainst: 35, goalDifference: 19, form: 'LWWDW' },
-        { position: 5, team: { name: 'Nice', tla: 'NIC', crest: 'https://www.thesportsdb.com/images/media/team/badge/nice.png' }, playedGames: 34, won: 17, draw: 11, lost: 6, points: 62, goalsFor: 40, goalsAgainst: 25, goalDifference: 15, form: 'DDWWD' }
-      ] : []
+    const mockTables: { [key: string]: { [key: string]: any[] } } = {
+      // Premier League
+      'PL': {
+        '2024-2025': [
+          { position: 1, team: { name: 'Liverpool', tla: 'LIV', crest: 'https://www.thesportsdb.com/images/media/team/badge/liverpool.png' }, playedGames: 38, won: 25, draw: 9, lost: 4, points: 84, goalsFor: 86, goalsAgainst: 41, goalDifference: 45, form: 'DLDLW' },
+          { position: 2, team: { name: 'Arsenal', tla: 'ARS', crest: 'https://www.thesportsdb.com/images/media/team/badge/arsenal.png' }, playedGames: 38, won: 20, draw: 14, lost: 4, points: 74, goalsFor: 69, goalsAgainst: 34, goalDifference: 35, form: 'WWDLD' },
+          { position: 3, team: { name: 'Manchester City', tla: 'MCI', crest: 'https://www.thesportsdb.com/images/media/team/badge/man_city.png' }, playedGames: 38, won: 21, draw: 8, lost: 9, points: 71, goalsFor: 72, goalsAgainst: 44, goalDifference: 28, form: 'WWDWW' },
+          { position: 4, team: { name: 'Chelsea', tla: 'CHE', crest: 'https://www.thesportsdb.com/images/media/team/badge/chelsea.png' }, playedGames: 38, won: 20, draw: 9, lost: 9, points: 69, goalsFor: 64, goalsAgainst: 43, goalDifference: 21, form: 'WWLWW' },
+          { position: 5, team: { name: 'Newcastle United', tla: 'NEW', crest: 'https://www.thesportsdb.com/images/media/team/badge/newcastle.png' }, playedGames: 38, won: 20, draw: 6, lost: 12, points: 66, goalsFor: 68, goalsAgainst: 47, goalDifference: 21, form: 'LLWDW' }
+        ],
+        '2023-2024': [
+          { position: 1, team: { name: 'Manchester City', tla: 'MCI', crest: 'https://www.thesportsdb.com/images/media/team/badge/man_city.png' }, playedGames: 38, won: 28, draw: 7, lost: 3, points: 91, goalsFor: 96, goalsAgainst: 34, goalDifference: 62, form: 'WWWWW' },
+          { position: 2, team: { name: 'Arsenal', tla: 'ARS', crest: 'https://www.thesportsdb.com/images/media/team/badge/arsenal.png' }, playedGames: 38, won: 28, draw: 5, lost: 5, points: 89, goalsFor: 91, goalsAgainst: 29, goalDifference: 62, form: 'WWWWW' },
+          { position: 3, team: { name: 'Liverpool', tla: 'LIV', crest: 'https://www.thesportsdb.com/images/media/team/badge/liverpool.png' }, playedGames: 38, won: 24, draw: 10, lost: 4, points: 82, goalsFor: 86, goalsAgainst: 41, goalDifference: 45, form: 'WDWDL' },
+          { position: 4, team: { name: 'Aston Villa', tla: 'AVL', crest: 'https://www.thesportsdb.com/images/media/team/badge/aston_villa.png' }, playedGames: 38, won: 20, draw: 8, lost: 10, points: 68, goalsFor: 76, goalsAgainst: 61, goalDifference: 15, form: 'LDLDW' },
+          { position: 5, team: { name: 'Tottenham', tla: 'TOT', crest: 'https://www.thesportsdb.com/images/media/team/badge/tottenham.png' }, playedGames: 38, won: 20, draw: 6, lost: 12, points: 66, goalsFor: 74, goalsAgainst: 61, goalDifference: 13, form: 'WLWLL' }
+        ],
+        '2022-2023': [
+          { position: 1, team: { name: 'Manchester City', tla: 'MCI', crest: 'https://www.thesportsdb.com/images/media/team/badge/man_city.png' }, playedGames: 38, won: 28, draw: 5, lost: 5, points: 89, goalsFor: 94, goalsAgainst: 33, goalDifference: 61, form: 'LDWWW' },
+          { position: 2, team: { name: 'Arsenal', tla: 'ARS', crest: 'https://www.thesportsdb.com/images/media/team/badge/arsenal.png' }, playedGames: 38, won: 26, draw: 6, lost: 6, points: 84, goalsFor: 88, goalsAgainst: 43, goalDifference: 45, form: 'WLLWW' },
+          { position: 3, team: { name: 'Manchester United', tla: 'MUN', crest: 'https://www.thesportsdb.com/images/media/team/badge/man_united.png' }, playedGames: 38, won: 23, draw: 6, lost: 9, points: 75, goalsFor: 58, goalsAgainst: 43, goalDifference: 15, form: 'WWWWL' },
+          { position: 4, team: { name: 'Newcastle United', tla: 'NEW', crest: 'https://www.thesportsdb.com/images/media/team/badge/newcastle.png' }, playedGames: 38, won: 19, draw: 14, lost: 5, points: 71, goalsFor: 68, goalsAgainst: 33, goalDifference: 35, form: 'DDWDL' },
+          { position: 5, team: { name: 'Liverpool', tla: 'LIV', crest: 'https://www.thesportsdb.com/images/media/team/badge/liverpool.png' }, playedGames: 38, won: 19, draw: 10, lost: 9, points: 67, goalsFor: 75, goalsAgainst: 47, goalDifference: 28, form: 'DDWWW' }
+        ]
+      },
+      // La Liga
+      'PD': {
+        '2024-2025': [
+          { position: 1, team: { name: 'Real Madrid', tla: 'RMA', crest: 'https://www.thesportsdb.com/images/media/team/badge/real_madrid.png' }, playedGames: 38, won: 30, draw: 6, lost: 2, points: 96, goalsFor: 89, goalsAgainst: 24, goalDifference: 65, form: 'WWWWW' },
+          { position: 2, team: { name: 'Barcelona', tla: 'BAR', crest: 'https://www.thesportsdb.com/images/media/team/badge/barcelona.png' }, playedGames: 38, won: 28, draw: 7, lost: 3, points: 91, goalsFor: 85, goalsAgainst: 30, goalDifference: 55, form: 'WDWWL' },
+          { position: 3, team: { name: 'Atletico Madrid', tla: 'ATM', crest: 'https://www.thesportsdb.com/images/media/team/badge/atletico_madrid.png' }, playedGames: 38, won: 25, draw: 8, lost: 5, points: 83, goalsFor: 72, goalsAgainst: 38, goalDifference: 34, form: 'WDWLW' },
+          { position: 4, team: { name: 'Real Sociedad', tla: 'RSO', crest: 'https://www.thesportsdb.com/images/media/team/badge/real_sociedad.png' }, playedGames: 38, won: 20, draw: 10, lost: 8, points: 70, goalsFor: 65, goalsAgainst: 45, goalDifference: 20, form: 'WWDLD' },
+          { position: 5, team: { name: 'Athletic Bilbao', tla: 'ATH', crest: 'https://www.thesportsdb.com/images/media/team/badge/athletic_bilbao.png' }, playedGames: 38, won: 19, draw: 13, lost: 6, points: 70, goalsFor: 61, goalsAgainst: 37, goalDifference: 24, form: 'DWDWW' }
+        ],
+        '2023-2024': [
+          { position: 1, team: { name: 'Real Madrid', tla: 'RMA', crest: 'https://www.thesportsdb.com/images/media/team/badge/real_madrid.png' }, playedGames: 38, won: 29, draw: 6, lost: 3, points: 95, goalsFor: 87, goalsAgainst: 26, goalDifference: 61, form: 'WWWDW' },
+          { position: 2, team: { name: 'Barcelona', tla: 'BAR', crest: 'https://www.thesportsdb.com/images/media/team/badge/barcelona.png' }, playedGames: 38, won: 27, draw: 7, lost: 4, points: 85, goalsFor: 79, goalsAgainst: 32, goalDifference: 47, form: 'WDWWL' },
+          { position: 3, team: { name: 'Girona', tla: 'GIR', crest: 'https://www.thesportsdb.com/images/media/team/badge/girona.png' }, playedGames: 38, won: 25, draw: 8, lost: 5, points: 81, goalsFor: 85, goalsAgainst: 46, goalDifference: 39, form: 'WWLDW' },
+          { position: 4, team: { name: 'Atletico Madrid', tla: 'ATM', crest: 'https://www.thesportsdb.com/images/media/team/badge/atletico_madrid.png' }, playedGames: 38, won: 24, draw: 8, lost: 6, points: 76, goalsFor: 70, goalsAgainst: 43, goalDifference: 27, form: 'WDWLW' },
+          { position: 5, team: { name: 'Athletic Bilbao', tla: 'ATH', crest: 'https://www.thesportsdb.com/images/media/team/badge/athletic_bilbao.png' }, playedGames: 38, won: 19, draw: 13, lost: 6, points: 68, goalsFor: 61, goalsAgainst: 37, goalDifference: 24, form: 'DWDWW' }
+        ],
+        '2022-2023': [
+          { position: 1, team: { name: 'Barcelona', tla: 'BAR', crest: 'https://www.thesportsdb.com/images/media/team/badge/barcelona.png' }, playedGames: 38, won: 28, draw: 4, lost: 6, points: 88, goalsFor: 70, goalsAgainst: 20, goalDifference: 50, form: 'WWWWL' },
+          { position: 2, team: { name: 'Real Madrid', tla: 'RMA', crest: 'https://www.thesportsdb.com/images/media/team/badge/real_madrid.png' }, playedGames: 38, won: 24, draw: 6, lost: 8, points: 78, goalsFor: 75, goalsAgainst: 36, goalDifference: 39, form: 'WLWWW' },
+          { position: 3, team: { name: 'Atletico Madrid', tla: 'ATM', crest: 'https://www.thesportsdb.com/images/media/team/badge/atletico_madrid.png' }, playedGames: 38, won: 23, draw: 8, lost: 7, points: 77, goalsFor: 70, goalsAgainst: 33, goalDifference: 37, form: 'WWDLW' },
+          { position: 4, team: { name: 'Real Sociedad', tla: 'RSO', crest: 'https://www.thesportsdb.com/images/media/team/badge/real_sociedad.png' }, playedGames: 38, won: 20, draw: 11, lost: 7, points: 71, goalsFor: 51, goalsAgainst: 35, goalDifference: 16, form: 'DWDLW' },
+          { position: 5, team: { name: 'Villarreal', tla: 'VIL', crest: 'https://www.thesportsdb.com/images/media/team/badge/villarreal.png' }, playedGames: 38, won: 19, draw: 7, lost: 12, points: 64, goalsFor: 59, goalsAgainst: 37, goalDifference: 22, form: 'WLWDL' }
+        ]
+      },
+      // Serie A
+      'SA': {
+        '2024-2025': [
+          { position: 1, team: { name: 'Inter Milan', tla: 'INT', crest: 'https://www.thesportsdb.com/images/media/team/badge/inter_milan.png' }, playedGames: 38, won: 29, draw: 7, lost: 2, points: 94, goalsFor: 89, goalsAgainst: 22, goalDifference: 67, form: 'WWWWW' },
+          { position: 2, team: { name: 'AC Milan', tla: 'MIL', crest: 'https://www.thesportsdb.com/images/media/team/badge/ac_milan.png' }, playedGames: 38, won: 26, draw: 8, lost: 4, points: 86, goalsFor: 76, goalsAgainst: 31, goalDifference: 45, form: 'WDWWL' },
+          { position: 3, team: { name: 'Juventus', tla: 'JUV', crest: 'https://www.thesportsdb.com/images/media/team/badge/juventus.png' }, playedGames: 38, won: 24, draw: 10, lost: 4, points: 82, goalsFor: 64, goalsAgainst: 29, goalDifference: 35, form: 'DWDWW' },
+          { position: 4, team: { name: 'Napoli', tla: 'NAP', crest: 'https://www.thesportsdb.com/images/media/team/badge/napoli.png' }, playedGames: 38, won: 23, draw: 8, lost: 7, points: 77, goalsFor: 74, goalsAgainst: 42, goalDifference: 32, form: 'WWLDW' },
+          { position: 5, team: { name: 'AS Roma', tla: 'ROM', crest: 'https://www.thesportsdb.com/images/media/team/badge/as_roma.png' }, playedGames: 38, won: 20, draw: 9, lost: 9, points: 69, goalsFor: 65, goalsAgainst: 45, goalDifference: 20, form: 'WLWDL' }
+        ],
+        '2023-2024': [
+          { position: 1, team: { name: 'Inter Milan', tla: 'INT', crest: 'https://www.thesportsdb.com/images/media/team/badge/inter_milan.png' }, playedGames: 38, won: 28, draw: 7, lost: 3, points: 91, goalsFor: 89, goalsAgainst: 22, goalDifference: 67, form: 'WWWWW' },
+          { position: 2, team: { name: 'AC Milan', tla: 'MIL', crest: 'https://www.thesportsdb.com/images/media/team/badge/ac_milan.png' }, playedGames: 38, won: 25, draw: 8, lost: 5, points: 83, goalsFor: 76, goalsAgainst: 31, goalDifference: 45, form: 'WDWWL' },
+          { position: 3, team: { name: 'Juventus', tla: 'JUV', crest: 'https://www.thesportsdb.com/images/media/team/badge/juventus.png' }, playedGames: 38, won: 23, draw: 10, lost: 5, points: 79, goalsFor: 64, goalsAgainst: 29, goalDifference: 35, form: 'DWDWW' },
+          { position: 4, team: { name: 'Napoli', tla: 'NAP', crest: 'https://www.thesportsdb.com/images/media/team/badge/napoli.png' }, playedGames: 38, won: 22, draw: 8, lost: 8, points: 74, goalsFor: 74, goalsAgainst: 42, goalDifference: 32, form: 'WWLDW' },
+          { position: 5, team: { name: 'AS Roma', tla: 'ROM', crest: 'https://www.thesportsdb.com/images/media/team/badge/as_roma.png' }, playedGames: 38, won: 19, draw: 9, lost: 10, points: 66, goalsFor: 65, goalsAgainst: 45, goalDifference: 20, form: 'WLWDL' }
+        ],
+        '2022-2023': [
+          { position: 1, team: { name: 'Napoli', tla: 'NAP', crest: 'https://www.thesportsdb.com/images/media/team/badge/napoli.png' }, playedGames: 38, won: 28, draw: 8, lost: 2, points: 90, goalsFor: 77, goalsAgainst: 28, goalDifference: 49, form: 'WWWWW' },
+          { position: 2, team: { name: 'Lazio', tla: 'LAZ', crest: 'https://www.thesportsdb.com/images/media/team/badge/lazio.png' }, playedGames: 38, won: 22, draw: 7, lost: 9, points: 73, goalsFor: 60, goalsAgainst: 35, goalDifference: 25, form: 'WLWWL' },
+          { position: 3, team: { name: 'Inter Milan', tla: 'INT', crest: 'https://www.thesportsdb.com/images/media/team/badge/inter_milan.png' }, playedGames: 38, won: 23, draw: 4, lost: 11, points: 73, goalsFor: 71, goalsAgainst: 42, goalDifference: 29, form: 'LWWDW' },
+          { position: 4, team: { name: 'AC Milan', tla: 'MIL', crest: 'https://www.thesportsdb.com/images/media/team/badge/ac_milan.png' }, playedGames: 38, won: 20, draw: 12, lost: 6, points: 72, goalsFor: 57, goalsAgainst: 40, goalDifference: 17, form: 'DDWWL' },
+          { position: 5, team: { name: 'Atalanta', tla: 'ATA', crest: 'https://www.thesportsdb.com/images/media/team/badge/atalanta.png' }, playedGames: 38, won: 19, draw: 10, lost: 9, points: 67, goalsFor: 64, goalsAgainst: 42, goalDifference: 22, form: 'WDWLW' }
+        ]
+      },
+      // Bundesliga
+      'BL1': {
+        '2024-2025': [
+          { position: 1, team: { name: 'Bayern Munich', tla: 'BAY', crest: 'https://www.thesportsdb.com/images/media/team/badge/bayern_munich.png' }, playedGames: 34, won: 26, draw: 6, lost: 2, points: 84, goalsFor: 94, goalsAgainst: 27, goalDifference: 67, form: 'WWWWW' },
+          { position: 2, team: { name: 'Borussia Dortmund', tla: 'BVB', crest: 'https://www.thesportsdb.com/images/media/team/badge/borussia_dortmund.png' }, playedGames: 34, won: 22, draw: 8, lost: 4, points: 74, goalsFor: 73, goalsAgainst: 38, goalDifference: 35, form: 'WDWWL' },
+          { position: 3, team: { name: 'RB Leipzig', tla: 'RBL', crest: 'https://www.thesportsdb.com/images/media/team/badge/rb_leipzig.png' }, playedGames: 34, won: 20, draw: 9, lost: 5, points: 69, goalsFor: 68, goalsAgainst: 37, goalDifference: 31, form: 'DWDWW' },
+          { position: 4, team: { name: 'Bayer Leverkusen', tla: 'B04', crest: 'https://www.thesportsdb.com/images/media/team/badge/bayer_leverkusen.png' }, playedGames: 34, won: 19, draw: 10, lost: 5, points: 67, goalsFor: 65, goalsAgainst: 37, goalDifference: 28, form: 'WWLDW' },
+          { position: 5, team: { name: 'Eintracht Frankfurt', tla: 'SGE', crest: 'https://www.thesportsdb.com/images/media/team/badge/eintracht_frankfurt.png' }, playedGames: 34, won: 18, draw: 7, lost: 9, points: 61, goalsFor: 58, goalsAgainst: 44, goalDifference: 14, form: 'WLWDL' }
+        ],
+        '2023-2024': [
+          { position: 1, team: { name: 'Bayer Leverkusen', tla: 'B04', crest: 'https://www.thesportsdb.com/images/media/team/badge/bayer_leverkusen.png' }, playedGames: 34, won: 28, draw: 6, lost: 0, points: 90, goalsFor: 89, goalsAgainst: 24, goalDifference: 65, form: 'WWWWW' },
+          { position: 2, team: { name: 'Bayern Munich', tla: 'BAY', crest: 'https://www.thesportsdb.com/images/media/team/badge/bayern_munich.png' }, playedGames: 34, won: 24, draw: 8, lost: 2, points: 80, goalsFor: 94, goalsAgainst: 45, goalDifference: 49, form: 'WDWWL' },
+          { position: 3, team: { name: 'VfB Stuttgart', tla: 'VFB', crest: 'https://www.thesportsdb.com/images/media/team/badge/vfb_stuttgart.png' }, playedGames: 34, won: 23, draw: 4, lost: 7, points: 73, goalsFor: 78, goalsAgainst: 39, goalDifference: 39, form: 'WWLDW' },
+          { position: 4, team: { name: 'RB Leipzig', tla: 'RBL', crest: 'https://www.thesportsdb.com/images/media/team/badge/rb_leipzig.png' }, playedGames: 34, won: 19, draw: 9, lost: 6, points: 66, goalsFor: 68, goalsAgainst: 37, goalDifference: 31, form: 'DWDWW' },
+          { position: 5, team: { name: 'Borussia Dortmund', tla: 'BVB', crest: 'https://www.thesportsdb.com/images/media/team/badge/borussia_dortmund.png' }, playedGames: 34, won: 18, draw: 9, lost: 7, points: 63, goalsFor: 68, goalsAgainst: 42, goalDifference: 26, form: 'WLWDL' }
+        ],
+        '2022-2023': [
+          { position: 1, team: { name: 'Bayern Munich', tla: 'BAY', crest: 'https://www.thesportsdb.com/images/media/team/badge/bayern_munich.png' }, playedGames: 34, won: 24, draw: 6, lost: 4, points: 78, goalsFor: 92, goalsAgainst: 38, goalDifference: 54, form: 'WWWWL' },
+          { position: 2, team: { name: 'Borussia Dortmund', tla: 'BVB', crest: 'https://www.thesportsdb.com/images/media/team/badge/borussia_dortmund.png' }, playedGames: 34, won: 22, draw: 7, lost: 5, points: 73, goalsFor: 84, goalsAgainst: 38, goalDifference: 46, form: 'WLWWW' },
+          { position: 3, team: { name: 'RB Leipzig', tla: 'RBL', crest: 'https://www.thesportsdb.com/images/media/team/badge/rb_leipzig.png' }, playedGames: 34, won: 22, draw: 6, lost: 6, points: 72, goalsFor: 64, goalsAgainst: 35, goalDifference: 29, form: 'DWDWW' },
+          { position: 4, team: { name: 'Union Berlin', tla: 'FCU', crest: 'https://www.thesportsdb.com/images/media/team/badge/union_berlin.png' }, playedGames: 34, won: 17, draw: 13, lost: 4, points: 64, goalsFor: 51, goalsAgainst: 33, goalDifference: 18, form: 'DDWLW' },
+          { position: 5, team: { name: 'SC Freiburg', tla: 'SCF', crest: 'https://www.thesportsdb.com/images/media/team/badge/sc_freiburg.png' }, playedGames: 34, won: 17, draw: 10, lost: 7, points: 61, goalsFor: 51, goalsAgainst: 40, goalDifference: 11, form: 'WDWLW' }
+        ]
+      },
+      // Ligue 1  
+      'FL1': {
+        '2024-2025': [
+          { position: 1, team: { name: 'Paris Saint-Germain', tla: 'PSG', crest: 'https://www.thesportsdb.com/images/media/team/badge/psg.png' }, playedGames: 34, won: 27, draw: 6, lost: 1, points: 87, goalsFor: 89, goalsAgainst: 35, goalDifference: 54, form: 'WWDWW' },
+          { position: 2, team: { name: 'AS Monaco', tla: 'MON', crest: 'https://www.thesportsdb.com/images/media/team/badge/monaco.png' }, playedGames: 34, won: 22, draw: 9, lost: 3, points: 75, goalsFor: 68, goalsAgainst: 34, goalDifference: 34, form: 'WDWWD' },
+          { position: 3, team: { name: 'Marseille', tla: 'OM', crest: 'https://www.thesportsdb.com/images/media/team/badge/marseille.png' }, playedGames: 34, won: 20, draw: 8, lost: 6, points: 68, goalsFor: 63, goalsAgainst: 38, goalDifference: 25, form: 'WWLDW' },
+          { position: 4, team: { name: 'Lille', tla: 'LIL', crest: 'https://www.thesportsdb.com/images/media/team/badge/lille.png' }, playedGames: 34, won: 18, draw: 10, lost: 6, points: 64, goalsFor: 54, goalsAgainst: 35, goalDifference: 19, form: 'LWWDW' },
+          { position: 5, team: { name: 'Nice', tla: 'NIC', crest: 'https://www.thesportsdb.com/images/media/team/badge/nice.png' }, playedGames: 34, won: 17, draw: 11, lost: 6, points: 62, goalsFor: 40, goalsAgainst: 25, goalDifference: 15, form: 'DDWWD' }
+        ],
+        '2023-2024': [
+          { position: 1, team: { name: 'Paris Saint-Germain', tla: 'PSG', crest: 'https://www.thesportsdb.com/images/media/team/badge/psg.png' }, playedGames: 34, won: 26, draw: 6, lost: 2, points: 84, goalsFor: 89, goalsAgainst: 35, goalDifference: 54, form: 'WWDWW' },
+          { position: 2, team: { name: 'AS Monaco', tla: 'MON', crest: 'https://www.thesportsdb.com/images/media/team/badge/monaco.png' }, playedGames: 34, won: 21, draw: 9, lost: 4, points: 72, goalsFor: 68, goalsAgainst: 34, goalDifference: 34, form: 'WDWWD' },
+          { position: 3, team: { name: 'Brest', tla: 'BRE', crest: 'https://www.thesportsdb.com/images/media/team/badge/brest.png' }, playedGames: 34, won: 18, draw: 11, lost: 5, points: 65, goalsFor: 56, goalsAgainst: 38, goalDifference: 18, form: 'DWDWL' },
+          { position: 4, team: { name: 'Lille', tla: 'LIL', crest: 'https://www.thesportsdb.com/images/media/team/badge/lille.png' }, playedGames: 34, won: 18, draw: 10, lost: 6, points: 64, goalsFor: 54, goalsAgainst: 35, goalDifference: 19, form: 'LWWDW' },
+          { position: 5, team: { name: 'Nice', tla: 'NIC', crest: 'https://www.thesportsdb.com/images/media/team/badge/nice.png' }, playedGames: 34, won: 17, draw: 11, lost: 6, points: 62, goalsFor: 40, goalsAgainst: 25, goalDifference: 15, form: 'DDWWD' }
+        ],
+        '2022-2023': [
+          { position: 1, team: { name: 'Paris Saint-Germain', tla: 'PSG', crest: 'https://www.thesportsdb.com/images/media/team/badge/psg.png' }, playedGames: 38, won: 29, draw: 6, lost: 3, points: 85, goalsFor: 89, goalsAgainst: 31, goalDifference: 58, form: 'WWWWL' },
+          { position: 2, team: { name: 'RC Lens', tla: 'RCL', crest: 'https://www.thesportsdb.com/images/media/team/badge/rc_lens.png' }, playedGames: 38, won: 25, draw: 7, lost: 6, points: 84, goalsFor: 68, goalsAgainst: 35, goalDifference: 33, form: 'WLWWW' },
+          { position: 3, team: { name: 'Marseille', tla: 'OM', crest: 'https://www.thesportsdb.com/images/media/team/badge/marseille.png' }, playedGames: 38, won: 24, draw: 9, lost: 5, points: 73, goalsFor: 63, goalsAgainst: 34, goalDifference: 29, form: 'WWLDW' },
+          { position: 4, team: { name: 'Rennes', tla: 'SRE', crest: 'https://www.thesportsdb.com/images/media/team/badge/rennes.png' }, playedGames: 38, won: 20, draw: 8, lost: 10, points: 68, goalsFor: 68, goalsAgainst: 40, goalDifference: 28, form: 'WDWLW' },
+          { position: 5, team: { name: 'Lille', tla: 'LIL', crest: 'https://www.thesportsdb.com/images/media/team/badge/lille.png' }, playedGames: 38, won: 19, draw: 10, lost: 9, points: 67, goalsFor: 54, goalsAgainst: 35, goalDifference: 19, form: 'LWWDW' }
+        ]
+      }
     };
 
     const competitionType = (competition === 'CL' || competition === 'EL') ? 'GROUP_STAGE' : 'REGULAR_SEASON';
-    const table = mockTables[competition]?.[competitionType] || mockTables[competition] || [];
+    const seasonData = mockTables[competition]?.[season || '2024-2025'] || mockTables[competition]?.['2024-2025'] || [];
     
     return {
       standings: [{
         stage: competitionType,
         type: competitionType === 'GROUP_STAGE' ? 'GROUP' : 'TOTAL',
-        table: table
+        table: seasonData
       }],
       competition: { 
         name: this.getCompetitionName(competition), 
